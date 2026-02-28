@@ -112,6 +112,10 @@ class PortalController extends BaseController
                     'orcamento_id' => $orcamento['id']
                 ]);
 
+                // 4. Create Order (Pedido) for execution
+                $pedidoModel = new \App\Models\Pedido();
+                $pedidoModel->createFromOrcamento($orcamento['id']);
+
                 // 4. Generate PDF with signature info
                 $orcamento['assinatura_imagem'] = $imagePath;
                 $orcamento['assinatura_ip'] = $ip;

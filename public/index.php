@@ -27,6 +27,7 @@ use App\Controllers\ClienteController;
 use App\Controllers\UserController;
 use App\Controllers\RoleController;
 use App\Controllers\FinanceiroController;
+use App\Controllers\PedidoController;
 
 route('/login', AuthController::class, 'showLogin', 'GET');
 route('/login', AuthController::class, 'login', 'POST');
@@ -59,6 +60,9 @@ route('/roles/store', RoleController::class, 'store', 'POST');
 // Financeiro Routes
 route('/financeiro', FinanceiroController::class, 'index', 'GET');
 route('/financeiro/store', FinanceiroController::class, 'store', 'POST');
+
+// Pedido Routes
+route('/pedidos', PedidoController::class, 'index', 'GET');
 
 // Handle dynamic routes
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -131,6 +135,18 @@ if (preg_match('/^\/usuarios\/delete\/(\d+)$/', $uri, $matches)) {
 if (preg_match('/^\/financeiro\/delete\/(\d+)$/', $uri, $matches)) {
     $ctrl = new FinanceiroController();
     $ctrl->delete($matches[1]);
+    exit;
+}
+
+// Pedido Dynamic Routes
+if (preg_match('/^\/pedidos\/view\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new PedidoController();
+    $ctrl->view($matches[1]);
+    exit;
+}
+if (preg_match('/^\/pedidos\/update\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new PedidoController();
+    $ctrl->update($matches[1]);
     exit;
 }
 

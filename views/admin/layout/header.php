@@ -52,6 +52,13 @@
                 <?php endif; ?>
 
                 <?php if (\App\Services\PermissionService::has('financeiro.manage')): ?>
+                <a href="/pedidos" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
+                    <i class="fa-solid fa-truck-front mr-3 text-slate-500 group-hover:text-blue-400"></i>
+                    Pedidos
+                </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('financeiro.manage')): ?>
                 <a href="/financeiro" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-wallet mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Financeiro
