@@ -1,4 +1,5 @@
 <?php
+die('Index point reached');
 
 session_start();
 
