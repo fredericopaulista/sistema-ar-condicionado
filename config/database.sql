@@ -216,3 +216,12 @@ CREATE TABLE IF NOT EXISTS pedidos (
     observacoes_tecnicas TEXT,
     FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- Catalogo de Servicos (AI Generated)
+CREATE TABLE IF NOT EXISTS catalogo_servicos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria VARCHAR(100) NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor_sugerido DECIMAL(10,2) DEFAULT 0.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
