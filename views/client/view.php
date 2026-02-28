@@ -110,6 +110,33 @@
             </div>
         </div>
 
+        <!-- Sticky Interaction Bar -->
+        <?php if ($orcamento['status'] != 'assinado'): ?>
+        <div id="action-bar" class="p-8 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-slate-600 text-sm font-medium">Você concorda com as condições acima?</p>
+            <div class="flex space-x-4 w-full md:w-auto">
+                <button onclick="approve()" class="flex-1 md:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/10 flex items-center justify-center">
+                    <i class="fa-solid fa-check mr-2"></i> Aprovar Orçamento
+                </button>
+                <button onclick="showChangeModal()" class="flex-1 md:flex-none px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-comment-dots mr-2"></i> Solicitar Alteração
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Modal Solicitar Alteração -->
+        <div id="changeModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 w-full max-w-lg rounded-3xl border border-slate-700 shadow-2xl p-8">
+                <h3 class="text-2xl font-bold text-white mb-4">O que precisa ser alterado?</h3>
+                <textarea id="changeText" rows="5" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-white outline-none focus:ring-2 focus:ring-blue-500 mb-6" placeholder="Descreva aqui sua solicitação..."></textarea>
+                <div class="flex gap-4">
+                    <button onclick="hideChangeModal()" class="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-2xl transition-all">Cancelar</button>
+                    <button onclick="submitChange()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-900/20">Enviar Solicitação</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Assinatura Digital -->
         <div id="signatureModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">

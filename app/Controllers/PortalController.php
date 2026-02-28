@@ -107,11 +107,16 @@ class PortalController extends BaseController
             ]);
 
             // 4. Generate PDF with signature info
-            // Refresh quote data to include signature for PDF
+            // Refresh quote data to include signature and items for PDF
             $orcamento['assinatura_imagem'] = $imagePath;
             $orcamento['assinatura_ip'] = $ip;
             $orcamento['assinatura_data'] = date('Y-m-d H:i:s');
             $orcamento['assinatura_hash'] = $hash;
+            
+            // Get items separately for the PDF
+            $stmt = $this->orcamentoModel->getConnection()->prepare("SELECT * FROM itens_orcamento WHERE orcamento_id = ?");
+            $stmt->execute([$orcamento['id']]);
+            $orcamento['itens'] = $stmt->fetchAll();
             
             \App\Services\ContratoService::gerarPDF($orcamento);
 
