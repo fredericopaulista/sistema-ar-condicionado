@@ -93,6 +93,17 @@ class PortalController extends BaseController
                 $emailService = new \App\Services\EmailService();
                 $emailService->sendContract($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $result['sign_url']);
 
+                // 4. Record Financial Entry (Entrada)
+                $financeiroModel = new \App\Models\Financeiro();
+                $financeiroModel->create([
+                    'descricao' => 'Pagamento Orçamento ' . $orcamento['numero'] . ' - ' . $orcamento['cliente_nome'],
+                    'valor' => $orcamento['valor_final'],
+                    'tipo' => 'entrada',
+                    'categoria' => 'Serviços',
+                    'data_transacao' => date('Y-m-d'),
+                    'orcamento_id' => $orcamento['id']
+                ]);
+
                 $this->json(['success' => true, 'message' => 'Orçamento aprovado e contrato enviado!']);
             } else {
                 $this->json(['success' => false, 'message' => 'Orçamento aprovado internamente, mas houve erro ao enviar para assinatura digital: ' . $result['message']]);
