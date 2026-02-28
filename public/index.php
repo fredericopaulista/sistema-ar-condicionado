@@ -170,9 +170,7 @@ if (preg_match('/^\/p\/([a-f0-9\-]+)\/solicitar-alteracao$/', $uri, $matches)) {
     exit;
 }
 
-// Webhook Route
-// use App\Controllers\WebhookController; // NO LONGER USED
-// route('/webhook/assinafy', WebhookController::class, 'assinafy', 'POST'); // NO LONGER USED
+// Webhook Route (No longer using external signature services)
 
 // Settings Routes
 use App\Controllers\SettingsController;

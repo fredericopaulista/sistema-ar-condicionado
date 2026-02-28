@@ -71,7 +71,7 @@
                         </div>
                         <div>
                             <p class="text-white font-bold text-sm">Assinatura</p>
-                            <p class="text-slate-500 text-xs">Digital (Assinafy)</p>
+                            <p class="text-slate-500 text-xs">Digital (Sistema)</p>
                         </div>
                     </div>
                     <span class="text-lg font-bold text-white"><?= round($taxaAssinatura) ?>%</span>

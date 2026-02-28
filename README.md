@@ -24,7 +24,7 @@ Sistema web para automação de orçamentos de climatização com assinatura dig
 4. Rode `composer install` (se estiver em um novo ambiente).
 
 ## 🎯 Fluxo
-Admin cria Orçamento -> Cliente recebe E-mail -> Cliente visualiza link -> Cliente Aprova -> Contrato é gerado e enviado para Assinafy -> Cliente assina digitalmente -> Status atualiza no dashboard.
+Admin cria Orçamento -> Cliente recebe E-mail -> Cliente visualiza link -> Cliente Aprova -> Contrato é gerado automaticamente -> Cliente assina digitalmente no portal -> PDF assinado é gerado com log de auditoria -> Sistema notifica partes e anexa cópia.
 
 ---
 Desenvolvido por Frederico Moura.
