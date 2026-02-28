@@ -48,11 +48,11 @@ route('/contratos', ContratoController::class, 'index', 'GET');
 // User Routes
 route('/usuarios', UserController::class, 'index', 'GET');
 route('/usuarios/novo', UserController::class, 'create', 'GET');
-route('/usuarios/novo', UserController::class, 'store', 'POST');
+route('/usuarios/store', UserController::class, 'store', 'POST');
 
 // Financeiro Routes
 route('/financeiro', FinanceiroController::class, 'index', 'GET');
-route('/financeiro/nova', FinanceiroController::class, 'store', 'POST');
+route('/financeiro/store', FinanceiroController::class, 'store', 'POST');
 
 // Handle dynamic routes
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
