@@ -75,8 +75,6 @@ CREATE TABLE IF NOT EXISTS orcamentos (
         'cancelado'
     ) DEFAULT 'criado',
     token_publico VARCHAR(255) UNIQUE,
-    assinafy_doc_id VARCHAR(100),
-    link_assinatura TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -193,9 +191,7 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('mail_user', 'noreply@soarcondicionadobh.com.br', 'Usuário/E-mail de envio'),
 ('mail_pass', 'OTGX(kj_IL,Ai#R)', 'Senha do e-mail'),
 ('mail_from_name', 'SÓ AR BH - Climatização', 'Nome exibido no remetente'),
-('mail_secure', 'ssl', 'Segurança (tls/ssl)'),
-('assinafy_api_key', 'IclOq0miwtZ13F3Up8tzVQaZMVotCrj0lxIEt8Nq9ml2Q3FYnTSCxXgLV4GQd4uy', 'Chave de API Assinafy'),
-('assinafy_base_url', 'https://api.assinafy.com.br/v1/', 'URL Base API Assinafy')
+('mail_secure', 'ssl', 'Segurança (tls/ssl)')
 ON DUPLICATE KEY UPDATE valor=VALUES(valor);
 
 -- Financeiro Table

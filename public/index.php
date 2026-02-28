@@ -69,7 +69,22 @@ if (preg_match('/^\/contratos\/refresh\/(\d+)$/', $uri, $matches)) {
 }
 if (preg_match('/^\/contratos\/reenviar\/(\d+)$/', $uri, $matches)) {
     $ctrl = new ContratoController();
-    $ctrl->resend($matches[1]);
+    $ctrl->reenviar($matches[1]);
+    exit;
+}
+if (preg_match('/^\/contratos\/enviar-copia\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ContratoController();
+    $ctrl->enviarCopia($matches[1]);
+    exit;
+}
+if (preg_match('/^\/contratos\/download\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ContratoController();
+    $ctrl->download($matches[1]);
+    exit;
+}
+if (preg_match('/^\/contratos\/deletar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ContratoController();
+    $ctrl->deletar($matches[1]);
     exit;
 }
 if (preg_match('/^\/clientes\/editar\/(\d+)$/', $uri, $matches)) {
@@ -156,8 +171,8 @@ if (preg_match('/^\/p\/([a-f0-9\-]+)\/solicitar-alteracao$/', $uri, $matches)) {
 }
 
 // Webhook Route
-use App\Controllers\WebhookController;
-route('/webhook/assinafy', WebhookController::class, 'assinafy', 'POST');
+// use App\Controllers\WebhookController; // NO LONGER USED
+// route('/webhook/assinafy', WebhookController::class, 'assinafy', 'POST'); // NO LONGER USED
 
 // Settings Routes
 use App\Controllers\SettingsController;

@@ -8,7 +8,6 @@ use App\Middlewares\AuthMiddleware;
 class ContratoController extends BaseController
 {
     private $orcamentoModel;
-    private $assinafyService;
 
     public function __construct()
     {
@@ -40,13 +39,79 @@ class ContratoController extends BaseController
         $this->redirect('/contratos');
     }
 
-    public function resend($id)
+    public function reenviar($id)
     {
-        // Resending logic for local signatures: Just redirect to portal link
-        $orcamento = $this->orcamentoModel->find($id);
+        $stmt = $this->orcamentoModel->getConnection()->prepare("
+            SELECT o.*, c.nome as cliente_nome, c.email as cliente_email
+            FROM orcamentos o
+            JOIN clientes c ON o.cliente_id = c.id
+            WHERE o.id = ?
+        ");
+        $stmt->execute([$id]);
+        $orcamento = $stmt->fetch();
+
         if ($orcamento) {
-            $this->redirect('/p/' . $orcamento['token_publico']);
+            $emailService = new \App\Services\EmailService();
+            $config = require __DIR__ . '/../../config/config.php';
+            $link = $config['app_url'] . '/p/' . $orcamento['token_publico'];
+
+            if ($emailService->sendContract($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $link)) {
+                $logModel = new \App\Models\Log();
+                $logModel->record($id, 'Link de assinatura reenviado para o cliente');
+            }
         }
+        $this->redirect('/contratos');
+    }
+
+    public function enviarCopia($id)
+    {
+        $stmt = $this->orcamentoModel->getConnection()->prepare("
+            SELECT o.*, c.nome as cliente_nome, c.email as cliente_email
+            FROM orcamentos o
+            JOIN clientes c ON o.cliente_id = c.id
+            WHERE o.id = ? AND o.status = 'assinado'
+        ");
+        $stmt->execute([$id]);
+        $orcamento = $stmt->fetch();
+
+        if ($orcamento && !empty($orcamento['contrato_pdf'])) {
+            $pdfPath = dirname(__DIR__, 2) . '/storage/contratos/' . $orcamento['contrato_pdf'];
+            
+            $emailService = new \App\Services\EmailService();
+            if ($emailService->sendSignedContractNotification($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $pdfPath)) {
+                $logModel = new \App\Models\Log();
+                $logModel->record($id, 'Cópia do contrato assinado enviada para o cliente');
+            }
+        }
+        $this->redirect('/contratos');
+    }
+
+    public function download($id)
+    {
+        $orcamento = $this->orcamentoModel->find($id);
+        if ($orcamento && !empty($orcamento['contrato_pdf'])) {
+            $pdfPath = dirname(__DIR__, 2) . '/storage/contratos/' . $orcamento['contrato_pdf'];
+            
+            if (file_exists($pdfPath)) {
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: attachment; filename="' . $orcamento['contrato_pdf'] . '"');
+                header('Content-Length: ' . filesize($pdfPath));
+                readfile($pdfPath);
+                exit;
+            }
+        }
+        $this->redirect('/contratos');
+    }
+
+    public function deletar($id)
+    {
+        // For contracts, "delete" just means stopping the signature flow
+        // We revert status to 'aprovado' so it doesn't show in the contracts list
+        $this->orcamentoModel->updateStatus($id, 'aprovado');
+        
+        $logModel = new \App\Models\Log();
+        $logModel->record($id, 'Contrato removido da lista de assinatura');
+        
         $this->redirect('/contratos');
     }
 }

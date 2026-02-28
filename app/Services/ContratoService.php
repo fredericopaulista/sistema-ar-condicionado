@@ -30,6 +30,11 @@ class ContratoService
         
         $path = $directory . $filename;
         file_put_contents($path, $output);
+
+        // Save PDF path to database
+        $model = new \App\Models\Orcamento();
+        $stmt = $model->getConnection()->prepare("UPDATE orcamentos SET contrato_pdf = ? WHERE id = ?");
+        $stmt->execute([$filename, $orcamento['id']]);
         
         return [
             'path' => $path,
