@@ -1,5 +1,4 @@
 <?php
-die('Index point reached');
 
 session_start();
 
@@ -18,8 +17,11 @@ function route($path, $controller, $method, $request_method = 'GET') {
     $uri = '/' . ltrim($uri, '/');
 
     if ($uri === $path && $_SERVER['REQUEST_METHOD'] === $request_method) {
+        if ($uri === '/pedidos') echo "Matching route /pedidos... ";
         $ctrl = new $controller();
+        if ($uri === '/pedidos') echo "Controller instantiated... ";
         $ctrl->$method();
+        if ($uri === '/pedidos') echo "Method called... ";
         exit;
     }
 }
