@@ -24,6 +24,8 @@ function route($path, $controller, $method, $request_method = 'GET') {
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\ClienteController;
+use App\Controllers\UserController;
+use App\Controllers\FinanceiroController;
 
 route('/login', AuthController::class, 'showLogin', 'GET');
 route('/login', AuthController::class, 'login', 'POST');
@@ -42,6 +44,15 @@ route('/orcamentos/novo', OrcamentoController::class, 'store', 'POST');
 
 use App\Controllers\ContratoController;
 route('/contratos', ContratoController::class, 'index', 'GET');
+
+// User Routes
+route('/usuarios', UserController::class, 'index', 'GET');
+route('/usuarios/novo', UserController::class, 'create', 'GET');
+route('/usuarios/novo', UserController::class, 'store', 'POST');
+
+// Financeiro Routes
+route('/financeiro', FinanceiroController::class, 'index', 'GET');
+route('/financeiro/nova', FinanceiroController::class, 'store', 'POST');
 
 // Handle dynamic routes
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -74,6 +85,30 @@ if (preg_match('/^\/clientes\/deletar\/(\d+)$/', $uri, $matches)) {
 
 if (preg_match('/^\/orcamentos\/deletar\/(\d+)$/', $uri, $matches)) {
     $ctrl = new OrcamentoController();
+    $ctrl->delete($matches[1]);
+    exit;
+}
+
+// User Dynamic Routes
+if (preg_match('/^\/usuarios\/editar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new UserController();
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $ctrl->edit($matches[1]);
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $ctrl->update($matches[1]);
+    }
+    exit;
+}
+
+if (preg_match('/^\/usuarios\/deletar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new UserController();
+    $ctrl->delete($matches[1]);
+    exit;
+}
+
+// Financeiro Dynamic Routes
+if (preg_match('/^\/financeiro\/deletar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new FinanceiroController();
     $ctrl->delete($matches[1]);
     exit;
 }
