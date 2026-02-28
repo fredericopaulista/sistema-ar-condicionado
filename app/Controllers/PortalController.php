@@ -61,68 +61,82 @@ class PortalController extends BaseController
             return;
         }
 
-        $stmt = $this->orcamentoModel->getConnection()->prepare("
-            SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
-                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
-            FROM orcamentos o
-            JOIN clientes c ON o.cliente_id = c.id
-            WHERE o.token_publico = ?
-        ");
-        $stmt->execute([$token]);
-        $orcamento = $stmt->fetch();
-
-        if ($orcamento) {
-            $logModel = new \App\Models\Log();
-            $logModel->record($orcamento['id'], 'Aprovação e assinatura pelo portal');
-
-            // 1. Process Signature
-            $sigService = new \App\Services\SignatureService();
-            $imagePath = $sigService->saveSignature($orcamento['id'], $signatureBase64);
+        try {
+            file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Starting approval for token: $token\n", FILE_APPEND);
             
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-            $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-            $hash = $sigService->generateSignatureHash($orcamento, $ip, $ua);
-
-            // 2. Update Status and Signature Data
             $stmt = $this->orcamentoModel->getConnection()->prepare("
-                UPDATE orcamentos SET 
-                status = 'assinado', 
-                assinatura_imagem = ?, 
-                assinatura_ip = ?, 
-                assinatura_data = NOW(), 
-                assinatura_hash = ? 
-                WHERE id = ?
+                SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
+                       c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
+                FROM orcamentos o
+                JOIN clientes c ON o.cliente_id = c.id
+                WHERE o.token_publico = ?
             ");
-            $stmt->execute([$imagePath, $ip, $hash, $orcamento['id']]);
+            $stmt->execute([$token]);
+            $orcamento = $stmt->fetch();
 
-            // 3. Record Financial Entry (Entrada)
-            $financeiroModel = new \App\Models\Financeiro();
-            $financeiroModel->create([
-                'descricao' => 'Pagamento Orçamento ' . $orcamento['numero'] . ' - ' . $orcamento['cliente_nome'],
-                'valor' => $orcamento['valor_final'],
-                'tipo' => 'entrada',
-                'categoria' => 'Serviços',
-                'data_transacao' => date('Y-m-d'),
-                'orcamento_id' => $orcamento['id']
-            ]);
+            if ($orcamento) {
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Quote found: " . $orcamento['id'] . "\n", FILE_APPEND);
+                
+                $logModel = new \App\Models\Log();
+                $logModel->record($orcamento['id'], 'Aprovação e assinatura pelo portal');
 
-            // 4. Generate PDF with signature info
-            // Refresh quote data to include signature and items for PDF
-            $orcamento['assinatura_imagem'] = $imagePath;
-            $orcamento['assinatura_ip'] = $ip;
-            $orcamento['assinatura_data'] = date('Y-m-d H:i:s');
-            $orcamento['assinatura_hash'] = $hash;
-            
-            // Get items separately for the PDF
-            $stmt = $this->orcamentoModel->getConnection()->prepare("SELECT * FROM itens_orcamento WHERE orcamento_id = ?");
-            $stmt->execute([$orcamento['id']]);
-            $orcamento['itens'] = $stmt->fetchAll();
-            
-            \App\Services\ContratoService::gerarPDF($orcamento);
+                // 1. Process Signature
+                $sigService = new \App\Services\SignatureService();
+                $imagePath = $sigService->saveSignature($orcamento['id'], $signatureBase64);
+                
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Signature saved: $imagePath\n", FILE_APPEND);
+                
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+                $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+                $hash = $sigService->generateSignatureHash($orcamento, $ip, $ua);
 
-            $this->json(['success' => true, 'message' => 'Orçamento aprovado e assinado com sucesso!']);
-        } else {
-            $this->json(['success' => false, 'message' => 'Orçamento não encontrado.'], 404);
+                // 2. Update Status and Signature Data
+                $stmt = $this->orcamentoModel->getConnection()->prepare("
+                    UPDATE orcamentos SET 
+                    status = 'assinado', 
+                    assinatura_imagem = ?, 
+                    assinatura_ip = ?, 
+                    assinatura_data = NOW(), 
+                    assinatura_hash = ? 
+                    WHERE id = ?
+                ");
+                $stmt->execute([$imagePath, $ip, $hash, $orcamento['id']]);
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Database updated\n", FILE_APPEND);
+
+                // 3. Record Financial Entry (Entrada)
+                $financeiroModel = new \App\Models\Financeiro();
+                $financeiroModel->create([
+                    'descricao' => 'Pagamento Orçamento ' . $orcamento['numero'] . ' - ' . $orcamento['cliente_nome'],
+                    'valor' => $orcamento['valor_final'],
+                    'tipo' => 'entrada',
+                    'categoria' => 'Serviços',
+                    'data_transacao' => date('Y-m-d'),
+                    'orcamento_id' => $orcamento['id']
+                ]);
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Finance record created\n", FILE_APPEND);
+
+                // 4. Generate PDF with signature info
+                $orcamento['assinatura_imagem'] = $imagePath;
+                $orcamento['assinatura_ip'] = $ip;
+                $orcamento['assinatura_data'] = date('Y-m-d H:i:s');
+                $orcamento['assinatura_hash'] = $hash;
+                
+                $stmtItems = $this->orcamentoModel->getConnection()->prepare("SELECT * FROM itens_orcamento WHERE orcamento_id = ?");
+                $stmtItems->execute([$orcamento['id']]);
+                $orcamento['itens'] = $stmtItems->fetchAll();
+                
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Starting PDF generation\n", FILE_APPEND);
+                \App\Services\ContratoService::gerarPDF($orcamento);
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "PDF generated\n", FILE_APPEND);
+
+                $this->json(['success' => true, 'message' => 'Orçamento aprovado e assinado com sucesso!']);
+            } else {
+                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Quote NOT found for token: $token\n", FILE_APPEND);
+                $this->json(['success' => false, 'message' => 'Orçamento não encontrado.'], 404);
+            }
+        } catch (\Exception $e) {
+            file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
+            $this->json(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()], 500);
         }
     }
 
