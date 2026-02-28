@@ -7,7 +7,7 @@ use PDO;
 class Configuracao extends BaseModel
 {
     protected $table = 'configuracoes_sistema';
-    protected $sensitiveKeys = ['mail_pass', 'assinafy_api_key'];
+    protected $sensitiveKeys = ['mail_pass'];
 
     public function all()
     {

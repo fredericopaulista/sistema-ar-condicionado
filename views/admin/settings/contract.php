@@ -52,18 +52,6 @@
                         </div>
                     </div>
 
-                    <!-- Assinafy Settings -->
-                    <div class="pt-6 border-t border-slate-700/50">
-                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
-                            <i class="fa-solid fa-key mr-2"></i> Integração Assinafy
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">Chave de API</label>
-                                <input type="password" name="config[assinafy_api_key]" value="<?= htmlspecialchars($config['assinafy_api_key'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Contract Template -->
                     <div class="pt-6 border-t border-slate-700/50">

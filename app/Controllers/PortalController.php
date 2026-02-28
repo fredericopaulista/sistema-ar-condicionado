@@ -52,6 +52,15 @@ class PortalController extends BaseController
 
     public function approve($token)
     {
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $signatureBase64 = $data['signature'] ?? '';
+
+        if (empty($signatureBase64)) {
+            $this->json(['success' => false, 'message' => 'A assinatura é obrigatória.'], 400);
+            return;
+        }
+
         $stmt = $this->orcamentoModel->getConnection()->prepare("
             SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
                    c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
@@ -63,52 +72,52 @@ class PortalController extends BaseController
         $orcamento = $stmt->fetch();
 
         if ($orcamento) {
-            // Log Approval attempt
             $logModel = new \App\Models\Log();
-            $logModel->record($orcamento['id'], 'Aprovação iniciada');
-            // Get items
-            $stmt = $this->orcamentoModel->getConnection()->prepare("SELECT * FROM itens_orcamento WHERE orcamento_id = ?");
-            $stmt->execute([$orcamento['id']]);
-            $orcamento['itens'] = $stmt->fetchAll();
+            $logModel->record($orcamento['id'], 'Aprovação e assinatura pelo portal');
 
-            // 1. Generate PDF
-            $pdfResult = \App\Services\ContratoService::gerarPDF($orcamento);
+            // 1. Process Signature
+            $sigService = new \App\Services\SignatureService();
+            $imagePath = $sigService->saveSignature($orcamento['id'], $signatureBase64);
+            
+            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+            $hash = $sigService->generateSignatureHash($orcamento, $ip, $ua);
 
-            // 2. Send to Assinafy
-            $assinafy = new \App\Services\AssinafyService();
-            $result = $assinafy->enviarParaAssinatura($orcamento, $pdfResult['base64']);
+            // 2. Update Status and Signature Data
+            $stmt = $this->orcamentoModel->getConnection()->prepare("
+                UPDATE orcamentos SET 
+                status = 'assinado', 
+                assinatura_imagem = ?, 
+                assinatura_ip = ?, 
+                assinatura_data = NOW(), 
+                assinatura_hash = ? 
+                WHERE id = ?
+            ");
+            $stmt->execute([$imagePath, $ip, $hash, $orcamento['id']]);
 
-            if ($result['success']) {
-                // 3. Update Status
-                $stmt = $this->orcamentoModel->getConnection()->prepare("
-                    UPDATE orcamentos SET 
-                    status = 'contrato_enviado', 
-                    assinafy_doc_id = ?, 
-                    link_assinatura = ? 
-                    WHERE id = ?
-                ");
-                $stmt->execute([$result['document_id'], $result['sign_url'], $orcamento['id']]);
+            // 3. Record Financial Entry (Entrada)
+            $financeiroModel = new \App\Models\Financeiro();
+            $financeiroModel->create([
+                'descricao' => 'Pagamento Orçamento ' . $orcamento['numero'] . ' - ' . $orcamento['cliente_nome'],
+                'valor' => $orcamento['valor_final'],
+                'tipo' => 'entrada',
+                'categoria' => 'Serviços',
+                'data_transacao' => date('Y-m-d'),
+                'orcamento_id' => $orcamento['id']
+            ]);
 
-                // Send Email via SMTP
-                $emailService = new \App\Services\EmailService();
-                $emailService->sendContract($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $result['sign_url']);
+            // 4. Generate PDF with signature info
+            // Refresh quote data to include signature for PDF
+            $orcamento['assinatura_imagem'] = $imagePath;
+            $orcamento['assinatura_ip'] = $ip;
+            $orcamento['assinatura_data'] = date('Y-m-d H:i:s');
+            $orcamento['assinatura_hash'] = $hash;
+            
+            \App\Services\ContratoService::gerarPDF($orcamento);
 
-                // 4. Record Financial Entry (Entrada)
-                $financeiroModel = new \App\Models\Financeiro();
-                $financeiroModel->create([
-                    'descricao' => 'Pagamento Orçamento ' . $orcamento['numero'] . ' - ' . $orcamento['cliente_nome'],
-                    'valor' => $orcamento['valor_final'],
-                    'tipo' => 'entrada',
-                    'categoria' => 'Serviços',
-                    'data_transacao' => date('Y-m-d'),
-                    'orcamento_id' => $orcamento['id']
-                ]);
-
-                $this->json(['success' => true, 'message' => 'Orçamento aprovado e contrato enviado!']);
-            } else {
-                $this->json(['success' => false, 'message' => 'Orçamento aprovado internamente, mas houve erro ao enviar para assinatura digital: ' . $result['message']]);
-            }
+            $this->json(['success' => true, 'message' => 'Orçamento aprovado e assinado com sucesso!']);
         } else {
+            $this->json(['success' => false, 'message' => 'Orçamento não encontrado.'], 404);
         }
     }
 

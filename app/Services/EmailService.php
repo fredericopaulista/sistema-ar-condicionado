@@ -105,7 +105,7 @@ class EmailService
                         <div style='margin-top: 32px; text-align: center;'>
                             <a href='{$signLink}' style='background: #10b981; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;'>Assinar Contrato Agora</a>
                         </div>
-                        <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Este link redirecionará você para a plataforma de assinatura Assinafy. É rápido, seguro e tem validade jurídica.</p>
+                        <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Este link redirecionará você para o nosso Portal do Cliente. A assinatura é realizada de forma eletrônica, rápida e segura.</p>
                     </div>
                     <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
                         &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.

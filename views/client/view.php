@@ -110,35 +110,43 @@
             </div>
         </div>
 
-        <!-- Sticky Interaction Bar -->
-        <?php if ($orcamento['status'] != 'assinado'): ?>
-        <div id="action-bar" class="p-8 bg-slate-50 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p class="text-slate-600 text-sm font-medium">Você concorda com as condições acima?</p>
-            <div class="flex space-x-4 w-full md:w-auto">
-                <button onclick="approve()" class="flex-1 md:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/10 flex items-center justify-center">
-                    <i class="fa-solid fa-check mr-2"></i> Aprovar Orçamento
-                </button>
-                <button onclick="showChangeModal()" class="flex-1 md:flex-none px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all flex items-center justify-center">
-                    <i class="fa-solid fa-comment-dots mr-2"></i> Solicitar Alteração
-                </button>
-            </div>
-        </div>
-        <?php endif; ?>
+        <!-- Modal Assinatura Digital -->
+        <div id="signatureModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
+                <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+                    <h3 class="text-xl font-bold">Assinatura Digital</h3>
+                    <button onclick="hideSignatureModal()" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-8">
+                    <p class="text-slate-600 text-sm mb-6">Utilize o mouse ou o dedo (em dispositivos touch) para assinar no campo abaixo:</p>
+                    
+                    <div class="relative bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 mb-6">
+                        <canvas id="signature-pad" class="w-full h-64 cursor-crosshair"></canvas>
+                        <button onclick="clearSignature()" class="absolute top-4 right-4 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors uppercase">
+                            <i class="fa-solid fa-eraser mr-1"></i> Limpar
+                        </button>
+                    </div>
 
-        <!-- Modal Solicitar Alteração -->
-        <div id="changeModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-slate-800 w-full max-w-lg rounded-3xl border border-slate-700 shadow-2xl p-8">
-                <h3 class="text-2xl font-bold text-white mb-4">O que precisa ser alterado?</h3>
-                <textarea id="changeText" rows="5" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-2xl text-white outline-none focus:ring-2 focus:ring-blue-500 mb-6" placeholder="Descreva aqui sua solicitação..."></textarea>
-                <div class="flex gap-4">
-                    <button onclick="hideChangeModal()" class="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-2xl transition-all">Cancelar</button>
-                    <button onclick="submitChange()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-900/20">Enviar Solicitação</button>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <button onclick="hideSignatureModal()" class="flex-1 px-6 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all">
+                            Cancelar
+                        </button>
+                        <button onclick="submitApproval()" class="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-900/20">
+                            Confirmar Assinatura
+                        </button>
+                    </div>
+                    
+                    <p class="text-center text-[10px] text-slate-400 mt-6 mt-6 uppercase tracking-widest leading-relaxed">
+                        Ao assinar, você concorda com os termos do orçamento e com o registro do seu IP e carimbo de data/hora para validade jurídica desta transação.
+                    </p>
                 </div>
             </div>
         </div>
-        
+
         <div id="success-bar" class="hidden p-8 bg-emerald-500 text-white text-center font-bold">
-            <i class="fa-solid fa-circle-check mr-2"></i> Orçamento aprovado com sucesso! Em breve você receberá o contrato para assinatura.
+            <i class="fa-solid fa-circle-check mr-2"></i> Orçamento assinado com sucesso!
         </div>
     </div>
 
@@ -146,39 +154,83 @@
         Sistema Desenvolvido por Frederico Moura
     </p>
 
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
     <script>
-    async function approve() {
-        const result = await Swal.fire({
-            title: 'Aprovar Orçamento?',
-            text: "Ao aprovar, um contrato será gerado automaticamente para sua assinatura digital.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#2563eb',
-            cancelButtonColor: '#334155',
-            confirmButtonText: 'Sim, aprovar!',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
+    let signaturePad;
+
+    window.onload = function() {
+        const canvas = document.getElementById('signature-pad');
+        signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            penColor: 'rgb(15, 23, 42)'
         });
 
-        if (!result.isConfirmed) return;
+        // Handle canvas resizing
+        function resizeCanvas() {
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        window.onresize = resizeCanvas;
+        resizeCanvas();
+    };
+
+    function clearSignature() {
+        signaturePad.clear();
+    }
+
+    function showSignatureModal() {
+        document.getElementById('signatureModal').classList.remove('hidden');
+        // Small delay to ensure canvas size is correct
+        setTimeout(() => {
+            const canvas = document.getElementById('signature-pad');
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear();
+        }, 100);
+    }
+
+    function hideSignatureModal() {
+        document.getElementById('signatureModal').classList.add('hidden');
+    }
+
+    function approve() {
+        showSignatureModal();
+    }
+
+    async function submitApproval() {
+        if (signaturePad.isEmpty()) {
+            return Swal.fire('Atenção', 'Por favor, realize a sua assinatura.', 'warning');
+        }
+
+        const signature = signaturePad.toDataURL();
         
         // Show loading
         Swal.fire({
             title: 'Processando...',
-            text: 'Gerando seu contrato, por favor aguarde.',
+            text: 'Finalizando a assinatura do seu contrato.',
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
 
         try {
             const token = '<?= $orcamento['token_publico'] ?>';
-            const response = await fetch(`/p/${token}/aprovar`, { method: 'POST' });
+            const response = await fetch(`/p/${token}/aprovar`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ signature: signature })
+            });
             const resultData = await response.json();
             
             if (resultData.success) {
+                hideSignatureModal();
                 await Swal.fire({
-                    title: 'Aprovado!',
-                    text: 'Orçamento aprovado com sucesso! Verifique seu e-mail para assinar o contrato.',
+                    title: 'Assinado!',
+                    text: 'Orçamento aprovado e assinado com sucesso!',
                     icon: 'success',
                     confirmButtonText: 'Entendido'
                 });

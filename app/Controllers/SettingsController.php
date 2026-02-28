@@ -23,7 +23,7 @@ class SettingsController extends BaseController
         $config = $this->configModel->all();
 
         // Redact sensitive data for the view
-        foreach (['mail_pass', 'assinafy_api_key'] as $key) {
+        foreach (['mail_pass'] as $key) {
             if (!empty($config[$key])) {
                 $config[$key] = \App\Utils\Security::redact($config[$key]);
             }
