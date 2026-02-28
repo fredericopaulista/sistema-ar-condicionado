@@ -90,7 +90,7 @@ if (preg_match('/^\/orcamentos\/deletar\/(\d+)$/', $uri, $matches)) {
 }
 
 // User Dynamic Routes
-if (preg_match('/^\/usuarios\/editar\/(\d+)$/', $uri, $matches)) {
+if (preg_match('/^\/usuarios\/edit\/(\d+)$/', $uri, $matches)) {
     $ctrl = new UserController();
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $ctrl->edit($matches[1]);
@@ -100,14 +100,14 @@ if (preg_match('/^\/usuarios\/editar\/(\d+)$/', $uri, $matches)) {
     exit;
 }
 
-if (preg_match('/^\/usuarios\/deletar\/(\d+)$/', $uri, $matches)) {
+if (preg_match('/^\/usuarios\/delete\/(\d+)$/', $uri, $matches)) {
     $ctrl = new UserController();
     $ctrl->delete($matches[1]);
     exit;
 }
 
 // Financeiro Dynamic Routes
-if (preg_match('/^\/financeiro\/deletar\/(\d+)$/', $uri, $matches)) {
+if (preg_match('/^\/financeiro\/delete\/(\d+)$/', $uri, $matches)) {
     $ctrl = new FinanceiroController();
     $ctrl->delete($matches[1]);
     exit;
