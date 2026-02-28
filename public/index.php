@@ -47,7 +47,7 @@ route('/contratos', ContratoController::class, 'index', 'GET');
 
 // User Routes
 route('/usuarios', UserController::class, 'index', 'GET');
-route('/usuarios/novo', UserController::class, 'create', 'GET');
+route('/usuarios/create', UserController::class, 'create', 'GET');
 route('/usuarios/store', UserController::class, 'store', 'POST');
 
 // Financeiro Routes
