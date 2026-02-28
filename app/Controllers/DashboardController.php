@@ -3,19 +3,24 @@
 namespace App\Controllers;
 
 use App\Models\Customer;
-use App\Models\Orcamento; // Will create this next
+use App\Models\Orcamento;
+use App\Models\Financeiro;
 use App\Middlewares\AuthMiddleware;
 
 class DashboardController extends BaseController
 {
+    private $financeiroModel;
+
     public function __construct()
     {
         AuthMiddleware::check();
+        $this->financeiroModel = new Financeiro();
     }
 
     public function index()
     {
         $db = \App\Services\Database::getInstance();
+        $monthlyStats = $this->financeiroModel->getMonthlyStats(6);
         
         // Total Clientes
         $totalClientes = $db->query("SELECT COUNT(id) FROM clientes")->fetchColumn();
@@ -53,7 +58,8 @@ class DashboardController extends BaseController
             'receitaPotencial' => $receitaPotencial,
             'taxaAprovacao' => $taxaAprovacao,
             'taxaAssinatura' => $taxaAssinatura,
-            'atividades' => $atividades
+            'atividades' => $atividades,
+            'monthlyStats' => $monthlyStats
         ]);
     }
 }

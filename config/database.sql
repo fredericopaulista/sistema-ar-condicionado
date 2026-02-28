@@ -148,4 +148,16 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('mail_secure', 'ssl', 'Segurança (tls/ssl)'),
 ('assinafy_api_key', 'IclOq0miwtZ13F3Up8tzVQaZMVotCrj0lxIEt8Nq9ml2Q3FYnTSCxXgLV4GQd4uy', 'Chave de API Assinafy'),
 ('assinafy_base_url', 'https://api.assinafy.com.br/v1/', 'URL Base API Assinafy')
-ON DUPLICATE KEY UPDATE valor=VALUES(valor);
+
+-- Financeiro Table
+CREATE TABLE IF NOT EXISTS financeiro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    tipo ENUM('entrada', 'saida') NOT NULL,
+    categoria VARCHAR(100),
+    data_transacao DATE NOT NULL,
+    orcamento_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
