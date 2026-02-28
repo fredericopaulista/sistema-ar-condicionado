@@ -45,11 +45,22 @@ class AssinafyService
                 ]
             ]);
 
-            $data = json_decode($response->getBody(), true);
+            $body = (string)$response->getBody();
+            $data = json_decode($body, true);
+            
+            // Debug log
+            error_log("Assinafy API Response Body: " . $body);
+
+            // Extract sign_url correctly. Assinafy returns 'signing_urls' as an array
+            $signUrl = $data['sign_url'] ?? null;
+            if (!$signUrl && !empty($data['signing_urls']) && is_array($data['signing_urls'])) {
+                $signUrl = $data['signing_urls'][0]['url'] ?? null;
+            }
+
             return [
                 'success' => true,
                 'document_id' => $data['id'] ?? null,
-                'sign_url' => $data['sign_url'] ?? null
+                'sign_url' => $signUrl
             ];
         } catch (\Exception $e) {
             error_log("Assinafy API Error: " . $e->getMessage());
