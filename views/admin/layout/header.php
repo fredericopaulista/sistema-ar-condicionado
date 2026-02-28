@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Painel' ?> - SÓ AR BH</title>
+    <title><?= $title ?? 'Painel' ?> - <?= htmlspecialchars($global_company['company_name'] ?? 'SÓ AR BH') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,8 +15,12 @@
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="w-64 bg-slate-800 border-r border-slate-700 flex-shrink-0">
-            <div class="p-6">
-                <h1 class="text-xl font-bold text-white tracking-tight">SÓ AR BH</h1>
+            <div class="px-6 py-8 border-b border-slate-700/50 mb-4">
+                <?php if (!empty($global_company['company_logo'])): ?>
+                    <img src="/<?= $global_company['company_logo'] ?>" class="h-12 w-auto object-contain brightness-0 invert mx-auto" alt="<?= htmlspecialchars($global_company['company_name']) ?>">
+                <?php else: ?>
+                    <h1 class="text-xl font-bold text-white tracking-tight text-center"><?= htmlspecialchars($global_company['company_name'] ?? 'SÓ AR BH') ?></h1>
+                <?php endif; ?>
             </div>
             <nav class="mt-4 px-4 space-y-2">
                 <?php if (\App\Services\PermissionService::has('dashboard.view')): ?>

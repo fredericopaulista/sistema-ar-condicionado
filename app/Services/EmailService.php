@@ -19,10 +19,32 @@ class EmailService
             'port' => $config['mail_port'] ?? 587,
             'user' => $config['mail_user'] ?? '',
             'pass' => $config['mail_pass'] ?? '',
-            'from_name' => $config['mail_from_name'] ?? 'SÓ AR BH - Climatização',
+            'from_name' => $config['mail_from_name'] ?: ($config['company_name'] ?? 'SÓ AR BH - Climatização'),
             'secure' => $config['mail_secure'] ?? 'tls',
-            'from_email' => $config['mail_from_email'] ?? ($config['mail_user'] ?? '')
+            'from_email' => $config['mail_from_email'] ?: ($config['mail_user'] ?? ''),
+            'company_name' => $config['company_name'] ?? 'SÓ AR BH',
+            'company_logo' => !empty($config['company_logo']) ? $config['company_logo'] : null
         ];
+    }
+
+    private function getEmailHeader()
+    {
+        $name = htmlspecialchars($this->config['company_name']);
+        return "
+            <div style='background: #0f172a; padding: 32px; text-align: center;'>
+                <h1 style='color: white; margin: 0;'>{$name}</h1>
+            </div>
+        ";
+    }
+
+    private function getEmailFooter()
+    {
+        $name = htmlspecialchars($this->config['company_name']);
+        return "
+            <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
+                &copy; " . date('Y') . " {$name} - Todos os direitos reservados.
+            </div>
+        ";
     }
 
     public function sendQuote($toEmail, $toName, $quoteNumber, $publicLink)
@@ -43,13 +65,11 @@ class EmailService
             $mail->addAddress($toEmail, $toName);
 
             $mail->isHTML(true);
-            $mail->Subject = "Seu Orçamento SÓ AR BH [{$quoteNumber}]";
+            $mail->Subject = "Seu Orçamento {$this->config['company_name']} [{$quoteNumber}]";
             
             $body = "
                 <div style='font-family: sans-serif; color: #334155; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>
-                    <div style='background: #0f172a; padding: 32px; text-align: center;'>
-                        <h1 style='color: white; margin: 0;'>SÓ AR BH</h1>
-                    </div>
+                    " . $this->getEmailHeader() . "
                     <div style='padding: 32px;'>
                         <h2 style='color: #1e293b; margin-top: 0;'>Olá, {$toName}!</h2>
                         <p>Recebemos sua solicitação e preparamos um orçamento detalhado para você.</p>
@@ -59,9 +79,7 @@ class EmailService
                         </div>
                         <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Este link é seguro e exclusivo para você. Caso tenha dúvidas, responda este e-mail.</p>
                     </div>
-                    <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
-                        &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.
-                    </div>
+                    " . $this->getEmailFooter() . "
                 </div>
             ";
 
@@ -92,13 +110,11 @@ class EmailService
             $mail->addAddress($toEmail, $toName);
 
             $mail->isHTML(true);
-            $mail->Subject = "Assinatura de Contrato - Orçamento [{$quoteNumber}] - SÓ AR BH";
+            $mail->Subject = "Assinatura de Contrato - Orçamento [{$quoteNumber}] - {$this->config['company_name']}";
             
             $body = "
                 <div style='font-family: sans-serif; color: #334155; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>
-                    <div style='background: #0f172a; padding: 32px; text-align: center;'>
-                        <h1 style='color: white; margin: 0;'>SÓ AR BH</h1>
-                    </div>
+                    " . $this->getEmailHeader() . "
                     <div style='padding: 32px;'>
                         <h2 style='color: #1e293b; margin-top: 0;'>Olá, {$toName}!</h2>
                         <p>Seu orçamento foi aprovado! Agora, precisamos da sua assinatura digital no contrato para formalizarmos o serviço.</p>
@@ -108,9 +124,7 @@ class EmailService
                         </div>
                         <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Este link redirecionará você para o nosso Portal do Cliente. A assinatura é realizada de forma eletrônica, rápida e segura.</p>
                     </div>
-                    <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
-                        &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.
-                    </div>
+                    " . $this->getEmailFooter() . "
                 </div>
             ";
 
@@ -148,12 +162,12 @@ class EmailService
             }
 
             $mail->isHTML(true);
-            $mail->Subject = "Contrato Assinado - Orçamento [{$quoteNumber}] - SÓ AR BH";
+            $mail->Subject = "Contrato Assinado - Orçamento [{$quoteNumber}] - {$this->config['company_name']}";
             
             $body = "
                 <div style='font-family: sans-serif; color: #334155; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>
                     <div style='background: #10b981; padding: 32px; text-align: center;'>
-                        <h1 style='color: white; margin: 0;'>SÓ AR BH</h1>
+                        <h1 style='color: white; margin: 0;'>{$this->config['company_name']}</h1>
                     </div>
                     <div style='padding: 32px;'>
                         <h2 style='color: #1e293b; margin-top: 0;'>Tudo pronto, {$toName}!</h2>
@@ -162,9 +176,7 @@ class EmailService
                         <p>Anexamos uma cópia do contrato assinado (PDF) contendo o carimbo de data/hora e IP para sua segurança.</p>
                         <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Nossa equipe entrará em contato em breve para alinhar os próximos passos da execução do serviço.</p>
                     </div>
-                    <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
-                        &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.
-                    </div>
+                    " . $this->getEmailFooter() . "
                 </div>
             ";
 

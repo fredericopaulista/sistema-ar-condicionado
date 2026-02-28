@@ -48,6 +48,22 @@ class SettingsController extends BaseController
         }
 
         if (!empty($sysConfig)) {
+            // Handle Logo Upload
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = dirname(__DIR__, 2) . '/public/assets/img/logo/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0775, true);
+                }
+                
+                $extension = pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION);
+                $filename = 'logo_' . time() . '.' . $extension;
+                $targetPath = $uploadDir . $filename;
+                
+                if (move_uploaded_file($_FILES['logo']['tmp_name'], $targetPath)) {
+                    $sysConfig['company_logo'] = 'assets/img/logo/' . $filename;
+                }
+            }
+
             $success = $success && $this->configModel->updateMany($sysConfig);
         }
 

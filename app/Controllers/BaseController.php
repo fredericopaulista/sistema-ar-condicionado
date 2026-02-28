@@ -6,6 +6,10 @@ class BaseController
 {
     protected function view($path, $data = [])
     {
+        // Inject Global Company Config
+        $configModel = new \App\Models\Configuracao();
+        $data['global_company'] = $configModel->all();
+
         extract($data);
         require_once __DIR__ . "/../../views/{$path}.php";
     }

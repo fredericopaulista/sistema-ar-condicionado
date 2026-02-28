@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento <?= $orcamento['numero'] ?> - SÓ AR BH</title>
+    <title>Orçamento <?= $orcamento['numero'] ?> - <?= htmlspecialchars($company['company_name'] ?? 'SÓ AR BH') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,11 +22,20 @@
         <!-- Header -->
         <div class="bg-slate-900 text-white p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight mb-2">SÓ AR BH</h1>
+                <?php if (!empty($company['company_logo'])): ?>
+                    <img src="/<?= $company['company_logo'] ?>" class="h-16 mb-4 object-contain brightness-0 invert">
+                <?php else: ?>
+                    <h1 class="text-3xl font-extrabold tracking-tight mb-2"><?= htmlspecialchars($company['company_name'] ?? 'SÓ AR BH') ?></h1>
+                <?php endif; ?>
                 <p class="text-slate-400 text-sm">Climatização e Serviços Profissionais</p>
-                <div class="mt-4 flex items-center space-x-4 text-xs text-slate-500">
-                    <span><i class="fa-solid fa-phone mr-1"></i> (31) 9XXXX-XXXX</span>
-                    <span><i class="fa-solid fa-envelope mr-1"></i> contato@soarbh.com.br</span>
+                <div class="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
+                    <?php if (!empty($company['company_phone'])): ?>
+                        <span><i class="fa-solid fa-phone mr-1"></i> <?= htmlspecialchars($company['company_phone']) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($company['company_whatsapp'])): ?>
+                        <span><i class="fa-brands fa-whatsapp mr-1 text-emerald-500"></i> <?= htmlspecialchars($company['company_whatsapp']) ?></span>
+                    <?php endif; ?>
+                    <span><i class="fa-solid fa-envelope mr-1"></i> <?= htmlspecialchars($company['mail_user'] ?? 'contato@soarbh.com.br') ?></span>
                 </div>
             </div>
             <div class="mt-6 md:mt-0 text-right">
@@ -178,7 +187,7 @@
     </div>
 
     <p class="text-center text-slate-400 text-xs mt-8 uppercase font-bold tracking-widest">
-        Sistema Desenvolvido por Frederico Moura
+        &copy; <?= date('Y') ?> <?= htmlspecialchars($company['company_name'] ?? 'SÓ AR BH') ?> - Todos os direitos reservados
     </p>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SÓ AR BH</title>
+    <title>Login - <?= htmlspecialchars($global_company['company_name'] ?? 'SÓ AR BH') ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,11 @@
 <body class="bg-slate-900 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-md p-8 space-y-6 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700">
         <div class="text-center">
-            <h1 class="text-3xl font-bold text-white mb-2">SÓ AR BH</h1>
+            <?php if (!empty($global_company['company_logo'])): ?>
+                <img src="/<?= $global_company['company_logo'] ?>" class="h-16 w-auto object-contain brightness-0 invert mx-auto mb-4" alt="<?= htmlspecialchars($global_company['company_name']) ?>">
+            <?php else: ?>
+                <h1 class="text-3xl font-bold text-white mb-2"><?= htmlspecialchars($global_company['company_name'] ?? 'SÓ AR BH') ?></h1>
+            <?php endif; ?>
             <p class="text-slate-400">Sistema de Orçamentos</p>
         </div>
 
@@ -45,7 +49,7 @@
         </form>
 
         <p class="text-center text-slate-500 text-xs">
-            © <?= date('Y') ?> SÓ AR BH Climatização. Todos os direitos reservados.
+            © <?= date('Y') ?> <?= htmlspecialchars($global_company['company_name'] ?? 'SÓ AR BH') ?>. Todos os direitos reservados.
         </p>
     </div>
 </body>

@@ -45,8 +45,13 @@ class PortalController extends BaseController
         $logModel = new \App\Models\Log();
         $logModel->record($orcamento['id'], 'Visualizado via portal');
 
+        // Fetch Company Identity
+        $configModel = new \App\Models\Configuracao();
+        $company = $configModel->all();
+
         $this->view('client/view', [
-            'orcamento' => $orcamento
+            'orcamento' => $orcamento,
+            'company' => $company
         ]);
     }
 

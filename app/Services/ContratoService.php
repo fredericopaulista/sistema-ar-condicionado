@@ -48,10 +48,17 @@ class ContratoService
         $templateModel = new \App\Models\Template();
         $template = $templateModel->findByName('contrato_padrao');
         
+        // Fetch Company Config
+        $configModel = new \App\Models\Configuracao();
+        $company = $configModel->all();
+        $companyName = $company['company_name'] ?? 'SÓ AR BH - Climatização';
+        $companyCNPJ = $company['company_cnpj'] ?? '00.000.000/0001-00';
+        $companyAddress = $company['company_address'] ?? 'Belo Horizonte/MG';
+
         $html = $template['conteudo'];
 
         $description = "";
-        foreach ($orcamento['itens'] as $item) {
+        foreach ($orcamento['items'] ?? $orcamento['itens'] as $item) {
             $description .= "• {$item['categoria']}: {$item['descricao']} (Qtd: {$item['quantidade']})<br>";
         }
 
@@ -88,6 +95,9 @@ class ContratoService
         }
 
         $vars = [
+            '{{empresa_nome}}' => $companyName,
+            '{{empresa_cnpj}}' => $companyCNPJ,
+            '{{empresa_endereco}}' => $companyAddress,
             '{{cliente_nome}}' => $orcamento['cliente_nome'],
             '{{cliente_cpf_cnpj}}' => $orcamento['cliente_cpf_cnpj'],
             '{{cliente_endereco}}' => $fullAddress,
@@ -98,7 +108,9 @@ class ContratoService
             '{{assinatura_digital}}' => $signatureHtml
         ];
 
+        // Specific legacy replacements for SÓ AR BH hardcoded in template
         $rendered = str_replace(array_keys($vars), array_values($vars), $html);
+        $rendered = str_replace('SÓ AR BH - Climatização', $companyName, $rendered);
         
         // Auto-append if tag missing
         if (strpos($html, '{{assinatura_digital}}') === false) {

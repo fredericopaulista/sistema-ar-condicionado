@@ -19,7 +19,59 @@
         <!-- Editor -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
-                <form action="/configuracoes/update" method="POST" class="p-8 space-y-8">
+                <form action="/configuracoes/update" method="POST" enctype="multipart/form-data" class="p-8 space-y-8">
+                    <!-- Company Identity -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-id-card mr-2"></i> Identidade da Empresa
+                            </h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2 flex items-center gap-6 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+                                <div class="flex-shrink-0">
+                                    <?php if (!empty($config['company_logo'])): ?>
+                                        <img src="/<?= $config['company_logo'] ?>" class="w-20 h-20 object-contain bg-white rounded-lg p-2" id="logoPreview">
+                                    <?php else: ?>
+                                        <div class="w-20 h-20 bg-slate-800 rounded-lg flex items-center justify-center text-slate-600 border-2 border-dashed border-slate-700">
+                                            <i class="fa-solid fa-image text-2xl"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="flex-grow">
+                                    <label class="block text-xs font-medium text-slate-400 mb-2">Logo da Empresa</label>
+                                    <input type="file" name="logo" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-600/10 file:text-blue-400 hover:file:bg-blue-600/20 transition-all cursor-pointer">
+                                    <p class="text-[10px] text-slate-500 mt-2 italic">Formatos: PNG, JPG, SVG. Tamanho recomendado: 400x400px.</p>
+                                </div>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Nome da Empresa</label>
+                                <input type="text" name="config[company_name]" value="<?= htmlspecialchars($config['company_name'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">CNPJ</label>
+                                <input type="text" name="config[company_cnpj]" value="<?= htmlspecialchars($config['company_cnpj'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Telefone Fixo</label>
+                                <input type="text" name="config[company_phone]" value="<?= htmlspecialchars($config['company_phone'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">WhatsApp</label>
+                                <input type="text" name="config[company_whatsapp]" value="<?= htmlspecialchars($config['company_whatsapp'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Endereço Completo</label>
+                                <input type="text" name="config[company_address]" value="<?= htmlspecialchars($config['company_address'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Rua, Número, Bairro, Cidade/Estado">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- SMTP Settings -->
                     <div>
                         <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
@@ -101,6 +153,18 @@
                 <h3 class="text-lg font-bold text-white mb-4">Variáveis Disponíveis</h3>
                 <p class="text-slate-400 text-sm mb-4">Use estas tags para inserir dados dinâmicos no contrato:</p>
                 <div class="space-y-3">
+                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
+                        <code class="text-emerald-400 font-bold">{{empresa_nome}}</code>
+                        <p class="text-slate-500 text-xs mt-1">Nome da sua empresa</p>
+                    </div>
+                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
+                        <code class="text-emerald-400 font-bold">{{empresa_cnpj}}</code>
+                        <p class="text-slate-500 text-xs mt-1">CNPJ da sua empresa</p>
+                    </div>
+                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
+                        <code class="text-emerald-400 font-bold">{{empresa_endereco}}</code>
+                        <p class="text-slate-500 text-xs mt-1">Endereço da sua empresa</p>
+                    </div>
                     <div class="p-3 bg-slate-900 rounded-xl border border-slate-700">
                         <code class="text-blue-400 font-bold">{{cliente_nome}}</code>
                         <p class="text-slate-500 text-xs mt-1">Nome ou Razão Social</p>
