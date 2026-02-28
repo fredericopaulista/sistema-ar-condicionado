@@ -89,6 +89,10 @@ class PortalController extends BaseController
                 ");
                 $stmt->execute([$result['document_id'], $result['sign_url'], $orcamento['id']]);
 
+                // Send Email via SMTP
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendContract($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $result['sign_url']);
+
                 $this->json(['success' => true, 'message' => 'Orçamento aprovado e contrato enviado!']);
             } else {
                 $this->json(['success' => false, 'message' => 'Orçamento aprovado internamente, mas houve erro ao enviar para assinatura digital: ' . $result['message']]);

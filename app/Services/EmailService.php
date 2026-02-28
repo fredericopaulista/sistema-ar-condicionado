@@ -20,7 +20,6 @@ class EmailService
         $mail = new PHPMailer(true);
 
         try {
-            // Server settings
             $mail->isSMTP();
             $mail->Host       = $this->config['host'];
             $mail->SMTPAuth   = true;
@@ -30,11 +29,9 @@ class EmailService
             $mail->Port       = $this->config['port'];
             $mail->CharSet    = 'UTF-8';
 
-            // Recipients
             $mail->setFrom($this->config['user'], $this->config['from_name']);
             $mail->addAddress($toEmail, $toName);
 
-            // Content
             $mail->isHTML(true);
             $mail->Subject = "Seu Orçamento SÓ AR BH [{$quoteNumber}]";
             
@@ -63,6 +60,55 @@ class EmailService
             return $mail->send();
         } catch (Exception $e) {
             error_log("Email sending failed: {$mail->ErrorInfo}");
+            return false;
+        }
+    }
+
+    public function sendContract($toEmail, $toName, $quoteNumber, $signLink)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = $this->config['host'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $this->config['user'];
+            $mail->Password   = $this->config['pass'];
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = $this->config['port'];
+            $mail->CharSet    = 'UTF-8';
+
+            $mail->setFrom($this->config['user'], $this->config['from_name']);
+            $mail->addAddress($toEmail, $toName);
+
+            $mail->isHTML(true);
+            $mail->Subject = "Assinatura de Contrato - Orçamento [{$quoteNumber}] - SÓ AR BH";
+            
+            $body = "
+                <div style='font-family: sans-serif; color: #334155; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>
+                    <div style='background: #0f172a; padding: 32px; text-align: center;'>
+                        <h1 style='color: white; margin: 0;'>SÓ AR BH</h1>
+                    </div>
+                    <div style='padding: 32px;'>
+                        <h2 style='color: #1e293b; margin-top: 0;'>Olá, {$toName}!</h2>
+                        <p>Seu orçamento foi aprovado! Agora, precisamos da sua assinatura digital no contrato para formalizarmos o serviço.</p>
+                        <p>Orçamento: <strong>{$quoteNumber}</strong></p>
+                        <div style='margin-top: 32px; text-align: center;'>
+                            <a href='{$signLink}' style='background: #10b981; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;'>Assinar Contrato Agora</a>
+                        </div>
+                        <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Este link redirecionará você para a plataforma de assinatura Assinafy. É rápido, seguro e tem validade jurídica.</p>
+                    </div>
+                    <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
+                        &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.
+                    </div>
+                </div>
+            ";
+
+            $mail->Body = $body;
+
+            return $mail->send();
+        } catch (Exception $e) {
+            error_log("Contract email sending failed: {$mail->ErrorInfo}");
             return false;
         }
     }

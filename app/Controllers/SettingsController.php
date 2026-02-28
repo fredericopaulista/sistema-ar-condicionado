@@ -34,4 +34,17 @@ class SettingsController extends BaseController
             $this->redirect('/configuracoes?error=1');
         }
     }
+
+    public function testEmail()
+    {
+        $emailService = new \App\Services\EmailService();
+        $config = require __DIR__ . '/../../config/config.php';
+        $to = $config['mail']['user']; // Send to themselves
+        
+        if ($emailService->sendQuote($to, 'Teste de Configuração', 'TEST-001', $config['app_url'])) {
+            $this->redirect('/configuracoes?test_success=1');
+        } else {
+            $this->redirect('/configuracoes?test_error=1');
+        }
+    }
 }

@@ -25,13 +25,30 @@
                         <textarea name="conteudo" rows="25" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none"><?= htmlspecialchars($template['conteudo']) ?></textarea>
                     </div>
 
-                    <div class="flex justify-end">
+                    <div class="flex justify-between items-center">
+                        <a href="/configuracoes/test-email" class="text-slate-400 hover:text-white text-sm flex items-center transition-colors">
+                            <i class="fa-solid fa-envelope-circle-check mr-2"></i> Testar SMTP
+                        </a>
                         <button type="submit" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/20">
                             Salvar Alterações
                         </button>
                     </div>
                 </form>
             </div>
+
+            <?php if (isset($_GET['test_success'])): ?>
+            <div class="bg-blue-500/10 border border-blue-500/50 text-blue-400 px-6 py-4 rounded-2xl mt-6 flex items-center">
+                <i class="fa-solid fa-paper-plane mr-3"></i>
+                <span>E-mail de teste enviado para seu endereço SMTP! Verifique sua caixa de entrada.</span>
+            </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['test_error'])): ?>
+            <div class="bg-red-500/10 border border-red-500/50 text-red-400 px-6 py-4 rounded-2xl mt-6 flex items-center">
+                <i class="fa-solid fa-circle-exclamation mr-3"></i>
+                <span>Falha no envio do teste. Verifique as credenciais no arquivo de configuração.</span>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Help/Variables -->

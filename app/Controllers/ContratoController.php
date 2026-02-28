@@ -86,6 +86,10 @@ class ContratoController extends BaseController
                     WHERE id = ?
                 ");
                 $stmt->execute([$result['document_id'], $result['sign_url'], $id]);
+
+                // Send Email via SMTP
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendContract($orcamento['cliente_email'], $orcamento['cliente_nome'], $orcamento['numero'], $result['sign_url']);
             }
         }
 

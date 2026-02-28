@@ -105,6 +105,7 @@ route('/webhook/assinafy', WebhookController::class, 'assinafy', 'POST');
 use App\Controllers\SettingsController;
 route('/configuracoes', SettingsController::class, 'index');
 route('/configuracoes/update', SettingsController::class, 'update', 'POST');
+route('/configuracoes/test-email', SettingsController::class, 'testEmail', 'GET');
 
 // Default Route
 if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) === '/') {
