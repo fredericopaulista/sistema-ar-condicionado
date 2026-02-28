@@ -206,3 +206,13 @@ CREATE TABLE IF NOT EXISTS financeiro (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+-- Pedidos Table (Execução)
+CREATE TABLE IF NOT EXISTS pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orcamento_id INT NOT NULL,
+    data_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pendente', 'em_andamento', 'concluido', 'cancelado') DEFAULT 'pendente',
+    observacoes_tecnicas TEXT,
+    FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
