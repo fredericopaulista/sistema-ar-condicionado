@@ -3,8 +3,8 @@
 <div class="max-w-5xl mx-auto">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-white">Configurações de Contrato</h1>
-            <p class="text-slate-400 mt-1">Edite o modelo de contrato gerado para os clientes.</p>
+            <h1 class="text-3xl font-bold text-white">Configurações do Sistema</h1>
+            <p class="text-slate-400 mt-1">Gerencie chaves de API, servidor de e-mail e modelos de contrato.</p>
         </div>
     </div>
 
@@ -19,10 +19,58 @@
         <!-- Editor -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
-                <form action="/configuracoes/update" method="POST" class="p-8">
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-slate-300 mb-2">HTML do Template</label>
-                        <textarea name="conteudo" rows="25" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none"><?= htmlspecialchars($template['conteudo']) ?></textarea>
+                <form action="/configuracoes/update" method="POST" class="p-8 space-y-8">
+                    <!-- SMTP Settings -->
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
+                            <i class="fa-solid fa-envelope mr-2"></i> Configurações de E-mail (SMTP)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Servidor SMTP</label>
+                                <input type="text" name="config[mail_host]" value="<?= htmlspecialchars($config['mail_host'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Porta</label>
+                                <input type="text" name="config[mail_port]" value="<?= htmlspecialchars($config['mail_port'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Usuário / E-mail</label>
+                                <input type="text" name="config[mail_user]" value="<?= htmlspecialchars($config['mail_user'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Senha</label>
+                                <input type="password" name="config[mail_pass]" value="<?= htmlspecialchars($config['mail_pass'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Segurança</label>
+                                <select name="config[mail_secure]" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="tls" <?= ($config['mail_secure'] ?? 'tls') === 'tls' ? 'selected' : '' ?>>TLS (Porta 587)</option>
+                                    <option value="ssl" <?= ($config['mail_secure'] ?? '') === 'ssl' ? 'selected' : '' ?>>SSL (Porta 465)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assinafy Settings -->
+                    <div class="pt-6 border-t border-slate-700/50">
+                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
+                            <i class="fa-solid fa-key mr-2"></i> Integração Assinafy
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Chave de API</label>
+                                <input type="text" name="config[assinafy_api_key]" value="<?= htmlspecialchars($config['assinafy_api_key'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contract Template -->
+                    <div class="pt-6 border-t border-slate-700/50">
+                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center">
+                            <i class="fa-solid fa-file-signature mr-2"></i> Modelo de Contrato (HTML)
+                        </h3>
+                        <textarea name="conteudo" rows="15" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none"><?= htmlspecialchars($template['conteudo']) ?></textarea>
                     </div>
 
                     <div class="flex justify-between items-center">

@@ -8,27 +8,43 @@ use App\Middlewares\AuthMiddleware;
 class SettingsController extends BaseController
 {
     private $templateModel;
+    private $configModel;
 
     public function __construct()
     {
         AuthMiddleware::check();
-        $this->templateModel = new Template();
+        $this->templateModel = new \App\Models\Template();
+        $this->configModel = new \App\Models\Configuracao();
     }
 
     public function index()
     {
         $template = $this->templateModel->findByName('contrato_padrao');
+        $config = $this->configModel->all();
+
         $this->view('admin/settings/contract', [
-            'title' => 'Configurações de Contrato',
-            'template' => $template
+            'title' => 'Configurações do Sistema',
+            'template' => $template,
+            'config' => $config
         ]);
     }
 
     public function update()
     {
         $content = $_POST['conteudo'] ?? '';
+        $sysConfig = $_POST['config'] ?? [];
         
-        if ($this->templateModel->updateContent('contrato_padrao', $content)) {
+        $success = true;
+        
+        if (!empty($content)) {
+            $success = $success && $this->templateModel->updateContent('contrato_padrao', $content);
+        }
+
+        if (!empty($sysConfig)) {
+            $success = $success && $this->configModel->updateMany($sysConfig);
+        }
+
+        if ($success) {
             $this->redirect('/configuracoes?success=1');
         } else {
             $this->redirect('/configuracoes?error=1');
@@ -38,10 +54,10 @@ class SettingsController extends BaseController
     public function testEmail()
     {
         $emailService = new \App\Services\EmailService();
-        $config = require __DIR__ . '/../../config/config.php';
-        $to = $config['mail']['user']; // Send to themselves
+        $config = $this->configModel->all();
+        $to = $config['mail_user'] ?? '';
         
-        if ($emailService->sendQuote($to, 'Teste de Configuração', 'TEST-001', $config['app_url'])) {
+        if (!empty($to) && $emailService->sendQuote($to, 'Teste de Configuração', 'TEST-001', '#')) {
             $this->redirect('/configuracoes?test_success=1');
         } else {
             $this->redirect('/configuracoes?test_error=1');

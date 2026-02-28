@@ -11,8 +11,17 @@ class EmailService
 
     public function __construct()
     {
-        $allConfig = require __DIR__ . '/../../config/config.php';
-        $this->config = $allConfig['mail'];
+        $configModel = new \App\Models\Configuracao();
+        $config = $configModel->all();
+
+        $this->config = [
+            'host' => $config['mail_host'] ?? '',
+            'port' => $config['mail_port'] ?? 587,
+            'user' => $config['mail_user'] ?? '',
+            'pass' => $config['mail_pass'] ?? '',
+            'from_name' => $config['mail_from_name'] ?? 'SÓ AR BH',
+            'secure' => $config['mail_secure'] ?? 'tls'
+        ];
     }
 
     public function sendQuote($toEmail, $toName, $quoteNumber, $publicLink)
@@ -25,7 +34,7 @@ class EmailService
             $mail->SMTPAuth   = true;
             $mail->Username   = $this->config['user'];
             $mail->Password   = $this->config['pass'];
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPSecure = ($this->config['secure'] === 'ssl') ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = $this->config['port'];
             $mail->CharSet    = 'UTF-8';
 
@@ -74,7 +83,7 @@ class EmailService
             $mail->SMTPAuth   = true;
             $mail->Username   = $this->config['user'];
             $mail->Password   = $this->config['pass'];
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPSecure = ($this->config['secure'] === 'ssl') ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = $this->config['port'];
             $mail->CharSet    = 'UTF-8';
 

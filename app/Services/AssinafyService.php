@@ -12,9 +12,11 @@ class AssinafyService
 
     public function __construct()
     {
-        $config = require __DIR__ . '/../../config/config.php';
-        $this->apiKey = $config['assinafy']['api_key'];
-        $this->baseUrl = $config['assinafy']['base_url'];
+        $configModel = new \App\Models\Configuracao();
+        $config = $configModel->all();
+
+        $this->apiKey = $config['assinafy_api_key'] ?? '';
+        $this->baseUrl = $config['assinafy_base_url'] ?? '';
         
         $this->client = new Client([
             'base_uri' => $this->baseUrl,
