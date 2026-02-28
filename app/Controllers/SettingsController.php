@@ -22,6 +22,13 @@ class SettingsController extends BaseController
         $template = $this->templateModel->findByName('contrato_padrao');
         $config = $this->configModel->all();
 
+        // Redact sensitive data for the view
+        foreach (['mail_pass', 'assinafy_api_key'] as $key) {
+            if (!empty($config[$key])) {
+                $config[$key] = \App\Utils\Security::redact($config[$key]);
+            }
+        }
+
         $this->view('admin/settings/contract', [
             'title' => 'Configurações do Sistema',
             'template' => $template,

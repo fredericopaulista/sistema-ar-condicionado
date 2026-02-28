@@ -60,7 +60,7 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-400 mb-1">Chave de API</label>
-                                <input type="text" name="config[assinafy_api_key]" value="<?= htmlspecialchars($config['assinafy_api_key'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="password" name="config[assinafy_api_key]" value="<?= htmlspecialchars($config['assinafy_api_key'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                     </div>

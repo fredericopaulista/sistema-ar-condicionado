@@ -7,6 +7,7 @@ use PDO;
 class Configuracao extends BaseModel
 {
     protected $table = 'configuracoes_sistema';
+    protected $sensitiveKeys = ['mail_pass', 'assinafy_api_key'];
 
     public function all()
     {
@@ -15,7 +16,11 @@ class Configuracao extends BaseModel
         
         $config = [];
         foreach ($rows as $row) {
-            $config[$row['chave']] = $row['valor'];
+            $valor = $row['valor'];
+            if (in_array($row['chave'], $this->sensitiveKeys)) {
+                $valor = \App\Utils\Security::decrypt($valor);
+            }
+            $config[$row['chave']] = $valor;
         }
         return $config;
     }
@@ -25,13 +30,29 @@ class Configuracao extends BaseModel
         $stmt = $this->db->prepare("SELECT valor FROM {$this->table} WHERE chave = ? LIMIT 1");
         $stmt->execute([$chave]);
         $res = $stmt->fetch();
-        return $res ? $res['valor'] : $default;
+        
+        if ($res) {
+            $valor = $res['valor'];
+            if (in_array($chave, $this->sensitiveKeys)) {
+                $valor = \App\Utils\Security::decrypt($valor);
+            }
+            return $valor;
+        }
+        return $default;
     }
 
     public function updateMany($data)
     {
-        $stmt = $this->db->prepare("UPDATE {$this->table} SET valor = ? WHERE chave = ?");
         foreach ($data as $chave => $valor) {
+            // Process sensitive keys
+            if (in_array($chave, $this->sensitiveKeys)) {
+                if ($valor === '********') {
+                    continue; // Skip updating this specific key
+                }
+                $valor = \App\Utils\Security::encrypt($valor);
+            }
+            
+            $stmt = $this->db->prepare("UPDATE {$this->table} SET valor = ? WHERE chave = ?");
             $stmt->execute([$valor, $chave]);
         }
         return true;
