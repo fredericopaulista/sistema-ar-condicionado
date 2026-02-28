@@ -1,0 +1,104 @@
+<?php
+
+session_start();
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Simple Route Handler
+function route($path, $controller, $method, $request_method = 'GET') {
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    
+    // Adjust for subdirectories if needed (e.g. /sistema-ar/public/)
+    $base_path = '/'; // Change this if running in a subdirectory
+    $uri = str_replace($base_path, '/', $uri);
+    $uri = '/' . ltrim($uri, '/');
+
+    if ($uri === $path && $_SERVER['REQUEST_METHOD'] === $request_method) {
+        $ctrl = new $controller();
+        $ctrl->$method();
+        exit;
+    }
+}
+
+// Routes
+use App\Controllers\AuthController;
+use App\Controllers\DashboardController;
+use App\Controllers\ClienteController;
+
+route('/login', AuthController::class, 'showLogin', 'GET');
+route('/login', AuthController::class, 'login', 'POST');
+route('/logout', AuthController::class, 'logout', 'GET');
+
+route('/dashboard', DashboardController::class, 'index', 'GET');
+
+route('/clientes', ClienteController::class, 'index', 'GET');
+route('/clientes/novo', ClienteController::class, 'create', 'GET');
+route('/clientes/novo', ClienteController::class, 'store', 'POST');
+
+use App\Controllers\OrcamentoController;
+route('/orcamentos', OrcamentoController::class, 'index', 'GET');
+route('/orcamentos/novo', OrcamentoController::class, 'create', 'GET');
+route('/orcamentos/novo', OrcamentoController::class, 'store', 'POST');
+
+// Handle dynamic routes
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if (preg_match('/^\/clientes\/editar\/(\d+)$/', $uri, $matches)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $ctrl = new ClienteController();
+        $ctrl->edit($matches[1]);
+        exit;
+    } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $ctrl = new ClienteController();
+        $ctrl->update($matches[1]);
+        exit;
+    }
+}
+if (preg_match('/^\/clientes\/deletar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ClienteController();
+    $ctrl->delete($matches[1]);
+    exit;
+}
+
+if (preg_match('/^\/orcamentos\/deletar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new OrcamentoController();
+    $ctrl->delete($matches[1]);
+    exit;
+}
+
+// Public Portal Routes
+use App\Controllers\PortalController;
+if (preg_match('/^\/p\/([a-f0-9\-]+)$/', $uri, $matches)) {
+    // Note: Simple hex token regex
+    $ctrl = new PortalController();
+    $ctrl->viewByToken($matches[1]);
+    exit;
+}
+if (preg_match('/^\/p\/([a-f0-9\-]+)\/aprovar$/', $uri, $matches)) {
+    $ctrl = new PortalController();
+    $ctrl->approve($matches[1]);
+    exit;
+}
+if (preg_match('/^\/p\/([a-f0-9\-]+)\/solicitar-alteracao$/', $uri, $matches)) {
+    $ctrl = new PortalController();
+    $ctrl->requestChange($matches[1]);
+    exit;
+}
+
+// Webhook Route
+use App\Controllers\WebhookController;
+route('/webhook/assinafy', WebhookController::class, 'assinafy', 'POST');
+
+// Settings Routes
+use App\Controllers\SettingsController;
+route('/configuracoes', SettingsController::class, 'index');
+route('/configuracoes/update', SettingsController::class, 'update', 'POST');
+
+// Default Route
+if (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) === '/') {
+    header('Location: /login');
+    exit;
+}
+
+// 404
+http_response_code(404);
+echo "404 - Página não encontrada";
