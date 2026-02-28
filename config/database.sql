@@ -128,3 +128,23 @@ INSERT INTO templates (nome, conteudo) VALUES ('contrato_padrao', '
     Este documento é gerado automaticamente e requer assinatura digital para validade jurídica.
 </div>
 ') ON DUPLICATE KEY UPDATE id=id;
+-- Settings Table
+CREATE TABLE IF NOT EXISTS configuracoes_sistema (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    chave VARCHAR(100) UNIQUE NOT NULL,
+    valor TEXT,
+    descricao VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Default SMTP Settings
+INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES 
+('mail_host', 'mail.soarcondicionadobh.com.br', 'Servidor SMTP'),
+('mail_port', '465', 'Porta SMTP'),
+('mail_user', 'noreply@soarcondicionadobh.com.br', 'Usuário/E-mail de envio'),
+('mail_pass', 'OTGX(kj_IL,Ai#R)', 'Senha do e-mail'),
+('mail_from_name', 'SÓ AR BH - Climatização', 'Nome exibido no remetente'),
+('mail_secure', 'ssl', 'Segurança (tls/ssl)'),
+('assinafy_api_key', 'IclOq0miwtZ13F3Up8tzVQaZMVotCrj0lxIEt8Nq9ml2Q3FYnTSCxXgLV4GQd4uy', 'Chave de API Assinafy'),
+('assinafy_base_url', 'https://api.assinafy.com.br/v1/', 'URL Base API Assinafy')
+ON DUPLICATE KEY UPDATE valor=VALUES(valor);
