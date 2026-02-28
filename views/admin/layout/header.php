@@ -59,6 +59,10 @@
                     <i class="fa-solid fa-user-shield mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Equipe
                 </a>
+                <a href="/roles" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
+                    <i class="fa-solid fa-shield-halved mr-3 text-slate-500 group-hover:text-blue-400"></i>
+                    Níveis de Acesso
+                </a>
                 <?php endif; ?>
 
                 <?php if (\App\Services\PermissionService::has('configuracoes.manage')): ?>

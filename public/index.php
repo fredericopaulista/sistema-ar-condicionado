@@ -25,6 +25,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\ClienteController;
 use App\Controllers\UserController;
+use App\Controllers\RoleController;
 use App\Controllers\FinanceiroController;
 
 route('/login', AuthController::class, 'showLogin', 'GET');
@@ -49,6 +50,11 @@ route('/contratos', ContratoController::class, 'index', 'GET');
 route('/usuarios', UserController::class, 'index', 'GET');
 route('/usuarios/create', UserController::class, 'create', 'GET');
 route('/usuarios/store', UserController::class, 'store', 'POST');
+
+// Role Routes
+route('/roles', RoleController::class, 'index', 'GET');
+route('/roles/create', RoleController::class, 'create', 'GET');
+route('/roles/store', RoleController::class, 'store', 'POST');
 
 // Financeiro Routes
 route('/financeiro', FinanceiroController::class, 'index', 'GET');
@@ -109,6 +115,23 @@ if (preg_match('/^\/usuarios\/delete\/(\d+)$/', $uri, $matches)) {
 // Financeiro Dynamic Routes
 if (preg_match('/^\/financeiro\/delete\/(\d+)$/', $uri, $matches)) {
     $ctrl = new FinanceiroController();
+    $ctrl->delete($matches[1]);
+    exit;
+}
+
+// Role Dynamic Routes
+if (preg_match('/^\/roles\/edit\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new RoleController();
+    $ctrl->edit($matches[1]);
+    exit;
+}
+if (preg_match('/^\/roles\/update\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new RoleController();
+    $ctrl->update($matches[1]);
+    exit;
+}
+if (preg_match('/^\/roles\/delete\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new RoleController();
     $ctrl->delete($matches[1]);
     exit;
 }
