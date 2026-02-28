@@ -11,4 +11,13 @@ class AuthMiddleware
             exit;
         }
     }
+
+    public static function permission($slug)
+    {
+        self::check();
+        if (!\App\Services\PermissionService::has($slug)) {
+            header('Location: /dashboard?error=unauthorized');
+            exit;
+        }
+    }
 }

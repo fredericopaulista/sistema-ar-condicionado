@@ -11,7 +11,7 @@ class ClienteController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('clientes.manage');
         $this->customerModel = new Customer();
     }
 

@@ -11,7 +11,7 @@ class FinanceiroController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('financeiro.manage');
         $this->financeiroModel = new Financeiro();
     }
 

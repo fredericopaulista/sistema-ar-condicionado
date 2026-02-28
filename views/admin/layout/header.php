@@ -19,26 +19,54 @@
                 <h1 class="text-xl font-bold text-white tracking-tight">SÓ AR BH</h1>
             </div>
             <nav class="mt-4 px-4 space-y-2">
+                <?php if (\App\Services\PermissionService::has('dashboard.view')): ?>
                 <a href="/dashboard" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-chart-line mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Dashboard
                 </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('clientes.manage')): ?>
                 <a href="/clientes" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-users mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Clientes
                 </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('orcamentos.manage')): ?>
                 <a href="/orcamentos" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-file-invoice-dollar mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Orçamentos
                 </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('contratos.manage')): ?>
                 <a href="/contratos" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-file-contract mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Contratos
                 </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('financeiro.manage')): ?>
+                <a href="/financeiro" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
+                    <i class="fa-solid fa-wallet mr-3 text-slate-500 group-hover:text-blue-400"></i>
+                    Financeiro
+                </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('usuarios.manage')): ?>
+                <a href="/usuarios" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
+                    <i class="fa-solid fa-user-shield mr-3 text-slate-500 group-hover:text-blue-400"></i>
+                    Equipe
+                </a>
+                <?php endif; ?>
+
+                <?php if (\App\Services\PermissionService::has('configuracoes.manage')): ?>
                 <a href="/configuracoes" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-gear mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Configurações
                 </a>
+                <?php endif; ?>
                 <div class="pt-4 border-t border-slate-700 mt-4">
                     <a href="/logout" class="flex items-center px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all">
                         <i class="fa-solid fa-right-from-bracket mr-3"></i>

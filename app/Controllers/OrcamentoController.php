@@ -14,7 +14,7 @@ class OrcamentoController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('orcamentos.manage');
         $this->orcamentoModel = new Orcamento();
         $this->customerModel = new Customer();
     }

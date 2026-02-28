@@ -13,7 +13,7 @@ class ContratoController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('contratos.manage');
         $this->orcamentoModel = new Orcamento();
         $this->assinafyService = new AssinafyService();
     }

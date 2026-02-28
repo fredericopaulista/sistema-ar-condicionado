@@ -1,13 +1,39 @@
 -- Database for SÓ AR BH Quote System
 
--- Usuarios Table
+-- Roles Table
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    slug VARCHAR(50) UNIQUE NOT NULL,
+    descricao VARCHAR(255)
+) ENGINE=InnoDB;
+
+-- Permissions Table
+CREATE TABLE IF NOT EXISTS permissoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL
+) ENGINE=InnoDB;
+
+-- Role Permissions Table
+CREATE TABLE IF NOT EXISTS role_permissoes (
+    role_id INT NOT NULL,
+    permissao_id INT NOT NULL,
+    PRIMARY KEY (role_id, permissao_id),
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (permissao_id) REFERENCES permissoes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Usuarios Table (Updated with Role)
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    nivel ENUM('admin') DEFAULT 'admin',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    role_id INT NULL,
+    nivel ENUM('admin') DEFAULT 'admin', -- Keeping for backward compatibility temporarily
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- Clientes Table
@@ -78,10 +104,32 @@ CREATE TABLE IF NOT EXISTS logs_orcamento (
     FOREIGN KEY (orcamento_id) REFERENCES orcamentos(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
--- Inserir Admin (senha: admin123)
-INSERT INTO usuarios (id, nome, email, senha, nivel) 
-VALUES (1, 'Administrador', 'admin@soarbh.com.br', '$2y$10$7hXKKcX45LpPjrZdD27KmOt1qhR5jbT2I9qG037CrG6caskMslF/W', 'admin')
+-- Initial Roles
+INSERT INTO roles (id, nome, slug, descricao) VALUES 
+(1, 'Administrador', 'admin', 'Acesso total ao sistema'),
+(2, 'Gerente', 'gerente', 'Gestão de orçamentos e clientes sem acesso a configurações críticas'),
+(3, 'Vendedor', 'vendedor', 'Apenas criação e visualização de orçamentos/clientes')
 ON DUPLICATE KEY UPDATE id=id;
+
+-- Initial Permissions
+INSERT INTO permissoes (nome, slug) VALUES 
+('Visualizar Dashboard', 'dashboard.view'),
+('Gerenciar Clientes', 'clientes.manage'),
+('Gerenciar Orçamentos', 'orcamentos.manage'),
+('Gerenciar Contratos', 'contratos.manage'),
+('Gerenciar Financeiro', 'financeiro.manage'),
+('Gerenciar Usuários', 'usuarios.manage'),
+('Configurações do Sistema', 'configuracoes.manage')
+ON DUPLICATE KEY UPDATE slug=slug;
+
+-- Admin Permissions
+INSERT IGNORE INTO role_permissoes (role_id, permissao_id)
+SELECT 1, id FROM permissoes;
+
+-- Inserir Admin (senha: admin123)
+INSERT INTO usuarios (id, nome, email, senha, role_id, nivel) 
+VALUES (1, 'Administrador', 'admin@soarbh.com.br', '$2y$10$7hXKKcX45LpPjrZdD27KmOt1qhR5jbT2I9qG037CrG6caskMslF/W', 1, 'admin')
+ON DUPLICATE KEY UPDATE role_id=1;
 
 -- Templates Table
 CREATE TABLE IF NOT EXISTS templates (
@@ -148,6 +196,7 @@ INSERT INTO configuracoes_sistema (chave, valor, descricao) VALUES
 ('mail_secure', 'ssl', 'Segurança (tls/ssl)'),
 ('assinafy_api_key', 'IclOq0miwtZ13F3Up8tzVQaZMVotCrj0lxIEt8Nq9ml2Q3FYnTSCxXgLV4GQd4uy', 'Chave de API Assinafy'),
 ('assinafy_base_url', 'https://api.assinafy.com.br/v1/', 'URL Base API Assinafy')
+ON DUPLICATE KEY UPDATE valor=VALUES(valor);
 
 -- Financeiro Table
 CREATE TABLE IF NOT EXISTS financeiro (

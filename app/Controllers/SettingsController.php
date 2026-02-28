@@ -12,7 +12,7 @@ class SettingsController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('configuracoes.manage');
         $this->templateModel = new \App\Models\Template();
         $this->configModel = new \App\Models\Configuracao();
     }

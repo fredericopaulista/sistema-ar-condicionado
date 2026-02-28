@@ -13,7 +13,7 @@ class DashboardController extends BaseController
 
     public function __construct()
     {
-        AuthMiddleware::check();
+        AuthMiddleware::permission('dashboard.view');
         $this->financeiroModel = new Financeiro();
     }
 
