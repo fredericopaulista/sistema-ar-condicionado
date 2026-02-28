@@ -35,9 +35,27 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $db = new PDO($dsn, $db_user, $db_pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
         // 2. Import SQL
-        if (!file_exists($sqlFile)) throw new Exception("Arquivo database.sql não encontrado.");
-        $sql = file_get_contents($sqlFile);
-        $db->exec($sql);
+        if (!file_exists($sqlFile)) {
+            throw new Exception("Arquivo database.sql não encontrado.");
+        }
+        $sqlContent = file_get_contents($sqlFile);
+        
+        // Remove SQL comments to avoid false matches
+        $sqlContent = preg_replace('/--.*$/m', '', $sqlContent);
+        
+        // Split by semicolon followed by newline (much safer than global explode)
+        $queries = preg_split('/;(?=\s*$)/m', $sqlContent);
+        
+        foreach ($queries as $q) {
+            $q = trim($q);
+            if (!empty($q)) {
+                try {
+                    $db->exec($q);
+                } catch (Exception $e) {
+                    throw new Exception("Erro na consulta: " . substr($q, 0, 100) . "... | Erro: " . $e->getMessage());
+                }
+            }
+        }
 
         // 3. Update Admin
         $hashedPass = password_hash($admin_pass, PASSWORD_BCRYPT);

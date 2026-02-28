@@ -2,7 +2,7 @@
 
 -- Roles Table
 CREATE TABLE IF NOT EXISTS roles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     slug VARCHAR(50) UNIQUE NOT NULL,
     descricao VARCHAR(255)
@@ -10,15 +10,15 @@ CREATE TABLE IF NOT EXISTS roles (
 
 -- Permissions Table
 CREATE TABLE IF NOT EXISTS permissoes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL
 ) ENGINE=InnoDB;
 
 -- Role Permissions Table
 CREATE TABLE IF NOT EXISTS role_permissoes (
-    role_id INT NOT NULL,
-    permissao_id INT NOT NULL,
+    role_id INT(11) UNSIGNED NOT NULL,
+    permissao_id INT(11) UNSIGNED NOT NULL,
     PRIMARY KEY (role_id, permissao_id),
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
     FOREIGN KEY (permissao_id) REFERENCES permissoes(id) ON DELETE CASCADE
@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS role_permissoes (
 
 -- Usuarios Table (Updated with Role)
 CREATE TABLE IF NOT EXISTS usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    role_id INT NULL,
+    role_id INT(11) UNSIGNED NULL,
     nivel ENUM('admin') DEFAULT 'admin', -- Keeping for backward compatibility temporarily
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
