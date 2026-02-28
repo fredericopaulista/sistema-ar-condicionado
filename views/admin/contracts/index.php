@@ -54,10 +54,16 @@
                             <a href="/contratos/refresh/<?= $c['id'] ?>" class="text-blue-400 hover:text-blue-300 transition-colors" title="Sincronizar Status">
                                 <i class="fa-solid fa-rotate"></i>
                             </a>
+                            <a href="/contratos/reenviar/<?= $c['id'] ?>" class="text-emerald-400 hover:text-emerald-300 transition-colors" title="Reenviar Assinatura" onclick="return confirm('Deseja gerar um novo link e reenviar ao cliente?')">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </a>
                             <?php endif; ?>
-                            <a href="<?= $c['link_assinatura'] ?>" target="_blank" class="text-slate-400 hover:text-white transition-colors" title="Visualizar Contrato">
+                            
+                            <?php if (!empty($c['link_assinatura'])): ?>
+                            <a href="<?= $c['link_assinatura'] ?>" target="_blank" class="text-slate-400 hover:text-white transition-colors" title="Visualizar Link de Assinatura">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>

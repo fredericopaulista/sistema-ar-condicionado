@@ -50,6 +50,11 @@ if (preg_match('/^\/contratos\/refresh\/(\d+)$/', $uri, $matches)) {
     $ctrl->refresh($matches[1]);
     exit;
 }
+if (preg_match('/^\/contratos\/reenviar\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ContratoController();
+    $ctrl->resend($matches[1]);
+    exit;
+}
 if (preg_match('/^\/clientes\/editar\/(\d+)$/', $uri, $matches)) {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $ctrl = new ClienteController();

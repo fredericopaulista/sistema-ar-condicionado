@@ -52,4 +52,43 @@ class ContratoController extends BaseController
 
         $this->redirect('/contratos');
     }
+
+    public function resend($id)
+    {
+        $stmt = $this->orcamentoModel->getConnection()->prepare("
+            SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
+                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.bairro as cliente_bairro, c.cep as cliente_cep
+            FROM orcamentos o
+            JOIN clientes c ON o.cliente_id = c.id
+            WHERE o.id = ?
+        ");
+        $stmt->execute([$id]);
+        $orcamento = $stmt->fetch();
+
+        if ($orcamento) {
+            // Get items
+            $stmt = $this->orcamentoModel->getConnection()->prepare("SELECT * FROM itens_orcamento WHERE orcamento_id = ?");
+            $stmt->execute([$id]);
+            $orcamento['itens'] = $stmt->fetchAll();
+
+            // 1. Generate PDF again
+            $pdfResult = \App\Services\ContratoService::gerarPDF($orcamento);
+
+            // 2. Send to Assinafy again (creates a new document/link)
+            $result = $this->assinafyService->enviarParaAssinatura($orcamento, $pdfResult['base64']);
+
+            if ($result['success']) {
+                $stmt = $this->orcamentoModel->getConnection()->prepare("
+                    UPDATE orcamentos SET 
+                    status = 'contrato_enviado', 
+                    assinafy_doc_id = ?, 
+                    link_assinatura = ? 
+                    WHERE id = ?
+                ");
+                $stmt->execute([$result['document_id'], $result['sign_url'], $id]);
+            }
+        }
+
+        $this->redirect('/contratos');
+    }
 }
