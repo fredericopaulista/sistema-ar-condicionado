@@ -13,11 +13,13 @@ class PedidoController extends BaseController
     public function __construct()
     {
         AuthMiddleware::permission('financeiro.manage'); // Reusing financial permission for now
+        die('Constructor reached');
         $this->pedidoModel = new Pedido();
     }
 
     public function index()
     {
+        die('Index method reached');
         $pedidos = $this->pedidoModel->allWithDetails();
         $this->view('admin/orders/index', [
             'title' => 'Gestão de Pedidos (Execução)',
