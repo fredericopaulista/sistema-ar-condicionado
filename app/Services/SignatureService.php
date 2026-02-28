@@ -17,7 +17,7 @@ class SignatureService
         
         $imageBinary = base64_decode($data[1]);
         $filename = 'sig_' . $orcamentoId . '_' . time() . '.png';
-        $directory = __DIR__ . '/../../storage/assinaturas/';
+        $directory = dirname(__DIR__, 2) . '/storage/assinaturas/';
         
         if (!is_dir($directory)) {
             mkdir($directory, 0775, true);

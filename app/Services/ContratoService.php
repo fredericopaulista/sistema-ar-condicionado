@@ -22,8 +22,13 @@ class ContratoService
 
         $output = $dompdf->output();
         $filename = 'contrato_' . $orcamento['numero'] . '_' . time() . '.pdf';
-        $path = __DIR__ . '/../../storage/contratos/' . $filename;
         
+        $directory = dirname(__DIR__, 2) . '/storage/contratos/';
+        if (!is_dir($directory)) {
+            mkdir($directory, 0775, true);
+        }
+        
+        $path = $directory . $filename;
         file_put_contents($path, $output);
         
         return [
@@ -53,7 +58,7 @@ class ContratoService
         // Blocks for signature
         $signatureHtml = "";
         if (!empty($orcamento['assinatura_imagem'])) {
-            $basePath = '/Users/fredmoura/Downloads/sistema-ar/';
+            $basePath = dirname(__DIR__, 2) . '/';
             $imagePath = $basePath . $orcamento['assinatura_imagem'];
             if (file_exists($imagePath)) {
                 $type = pathinfo($imagePath, PATHINFO_EXTENSION);

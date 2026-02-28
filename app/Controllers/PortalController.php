@@ -62,8 +62,6 @@ class PortalController extends BaseController
         }
 
         try {
-            file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Starting approval for token: $token\n", FILE_APPEND);
-            
             $stmt = $this->orcamentoModel->getConnection()->prepare("
                 SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
                        c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
@@ -75,16 +73,12 @@ class PortalController extends BaseController
             $orcamento = $stmt->fetch();
 
             if ($orcamento) {
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Quote found: " . $orcamento['id'] . "\n", FILE_APPEND);
-                
                 $logModel = new \App\Models\Log();
                 $logModel->record($orcamento['id'], 'Aprovação e assinatura pelo portal');
 
                 // 1. Process Signature
                 $sigService = new \App\Services\SignatureService();
                 $imagePath = $sigService->saveSignature($orcamento['id'], $signatureBase64);
-                
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Signature saved: $imagePath\n", FILE_APPEND);
                 
                 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
                 $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
@@ -101,7 +95,6 @@ class PortalController extends BaseController
                     WHERE id = ?
                 ");
                 $stmt->execute([$imagePath, $ip, $hash, $orcamento['id']]);
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Database updated\n", FILE_APPEND);
 
                 // 3. Record Financial Entry (Entrada)
                 $financeiroModel = new \App\Models\Financeiro();
@@ -113,7 +106,6 @@ class PortalController extends BaseController
                     'data_transacao' => date('Y-m-d'),
                     'orcamento_id' => $orcamento['id']
                 ]);
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Finance record created\n", FILE_APPEND);
 
                 // 4. Generate PDF with signature info
                 $orcamento['assinatura_imagem'] = $imagePath;
@@ -125,17 +117,13 @@ class PortalController extends BaseController
                 $stmtItems->execute([$orcamento['id']]);
                 $orcamento['itens'] = $stmtItems->fetchAll();
                 
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Starting PDF generation\n", FILE_APPEND);
                 \App\Services\ContratoService::gerarPDF($orcamento);
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "PDF generated\n", FILE_APPEND);
 
                 $this->json(['success' => true, 'message' => 'Orçamento aprovado e assinado com sucesso!']);
             } else {
-                file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "Quote NOT found for token: $token\n", FILE_APPEND);
                 $this->json(['success' => false, 'message' => 'Orçamento não encontrado.'], 404);
             }
         } catch (\Exception $e) {
-            file_put_contents('/Users/fredmoura/Downloads/sistema-ar/storage/logs/debug.log', date('[Y-m-d H:i:s] ') . "ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
             $this->json(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()], 500);
         }
     }
