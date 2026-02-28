@@ -25,7 +25,7 @@ class PedidoController extends BaseController
         ]);
     }
 
-    public function view($id)
+    public function show($id)
     {
         $pedido = $this->pedidoModel->findWithDetails($id);
         if (!$pedido) {

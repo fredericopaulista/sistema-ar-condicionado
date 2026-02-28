@@ -2,9 +2,6 @@
 
 session_start();
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Simple Route Handler
@@ -17,11 +14,8 @@ function route($path, $controller, $method, $request_method = 'GET') {
     $uri = '/' . ltrim($uri, '/');
 
     if ($uri === $path && $_SERVER['REQUEST_METHOD'] === $request_method) {
-        if ($uri === '/pedidos') echo "Matching route /pedidos... ";
         $ctrl = new $controller();
-        if ($uri === '/pedidos') echo "Controller instantiated... ";
         $ctrl->$method();
-        if ($uri === '/pedidos') echo "Method called... ";
         exit;
     }
 }
@@ -147,7 +141,7 @@ if (preg_match('/^\/financeiro\/delete\/(\d+)$/', $uri, $matches)) {
 // Pedido Dynamic Routes
 if (preg_match('/^\/pedidos\/view\/(\d+)$/', $uri, $matches)) {
     $ctrl = new PedidoController();
-    $ctrl->view($matches[1]);
+    $ctrl->show($matches[1]);
     exit;
 }
 if (preg_match('/^\/pedidos\/update\/(\d+)$/', $uri, $matches)) {
