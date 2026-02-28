@@ -1,3 +1,4 @@
+<?php include __DIR__ . '/layout/header.php'; ?>
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl flex items-center">
