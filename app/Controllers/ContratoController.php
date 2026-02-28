@@ -26,7 +26,7 @@ class ContratoController extends BaseController
             FROM orcamentos o 
             JOIN clientes c ON o.cliente_id = c.id 
             WHERE o.status IN ('contrato_enviado', 'assinado')
-            ORDER BY o.updated_at DESC
+            ORDER BY o.created_at DESC
         ");
         $contratos = $stmt->fetchAll();
 
