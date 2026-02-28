@@ -40,8 +40,16 @@ route('/orcamentos', OrcamentoController::class, 'index', 'GET');
 route('/orcamentos/novo', OrcamentoController::class, 'create', 'GET');
 route('/orcamentos/novo', OrcamentoController::class, 'store', 'POST');
 
+use App\Controllers\ContratoController;
+route('/contratos', ContratoController::class, 'index', 'GET');
+
 // Handle dynamic routes
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+if (preg_match('/^\/contratos\/refresh\/(\d+)$/', $uri, $matches)) {
+    $ctrl = new ContratoController();
+    $ctrl->refresh($matches[1]);
+    exit;
+}
 if (preg_match('/^\/clientes\/editar\/(\d+)$/', $uri, $matches)) {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $ctrl = new ClienteController();

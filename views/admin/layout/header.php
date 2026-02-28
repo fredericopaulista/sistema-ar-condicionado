@@ -31,6 +31,10 @@
                     <i class="fa-solid fa-file-invoice-dollar mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Orçamentos
                 </a>
+                <a href="/contratos" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
+                    <i class="fa-solid fa-file-contract mr-3 text-slate-500 group-hover:text-blue-400"></i>
+                    Contratos
+                </a>
                 <a href="/configuracoes" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-xl transition-all group">
                     <i class="fa-solid fa-gear mr-3 text-slate-500 group-hover:text-blue-400"></i>
                     Configurações

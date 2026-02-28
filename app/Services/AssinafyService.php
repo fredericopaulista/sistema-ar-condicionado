@@ -57,4 +57,22 @@ class AssinafyService
             ];
         }
     }
+
+    public function getDocumentStatus($documentId)
+    {
+        try {
+            $response = $this->client->get("docs/{$documentId}");
+            $data = json_decode($response->getBody(), true);
+            return [
+                'success' => true,
+                'status' => $data['status'] ?? null, // e.g. signed, pending
+                'data' => $data
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }
