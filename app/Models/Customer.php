@@ -8,7 +8,7 @@ class Customer extends BaseModel
 
     public function create($data)
     {
-        $stmt = $this->db->prepare("INSERT INTO {$this->table} (nome, email, telefone, cpf_cnpj, endereco, numero, bairro, cep, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $this->db->prepare("INSERT INTO {$this->table} (nome, email, telefone, cpf_cnpj, endereco, numero, complemento, bairro, cep, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         return $stmt->execute([
             $data['nome'],
             $data['email'],
@@ -16,6 +16,7 @@ class Customer extends BaseModel
             $data['cpf_cnpj'],
             $data['endereco'],
             $data['numero'],
+            $data['complemento'] ?? null,
             $data['bairro'],
             $data['cep'],
             $data['cidade'],
@@ -25,7 +26,7 @@ class Customer extends BaseModel
 
     public function update($id, $data)
     {
-        $stmt = $this->db->prepare("UPDATE {$this->table} SET nome = ?, email = ?, telefone = ?, cpf_cnpj = ?, endereco = ?, numero = ?, bairro = ?, cep = ?, cidade = ?, estado = ? WHERE id = ?");
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET nome = ?, email = ?, telefone = ?, cpf_cnpj = ?, endereco = ?, numero = ?, complemento = ?, bairro = ?, cep = ?, cidade = ?, estado = ? WHERE id = ?");
         return $stmt->execute([
             $data['nome'],
             $data['email'],
@@ -33,6 +34,7 @@ class Customer extends BaseModel
             $data['cpf_cnpj'],
             $data['endereco'],
             $data['numero'],
+            $data['complemento'] ?? null,
             $data['bairro'],
             $data['cep'],
             $data['cidade'],

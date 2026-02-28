@@ -18,7 +18,7 @@ class PortalController extends BaseController
     {
         $stmt = $this->orcamentoModel->getConnection()->prepare("
             SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.telefone as cliente_telefone, 
-                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.bairro as cliente_bairro, c.cep as cliente_cep
+                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
             FROM orcamentos o
             JOIN clientes c ON o.cliente_id = c.id
             WHERE o.token_publico = ?
@@ -54,7 +54,7 @@ class PortalController extends BaseController
     {
         $stmt = $this->orcamentoModel->getConnection()->prepare("
             SELECT o.*, c.nome as cliente_nome, c.email as cliente_email, c.cpf_cnpj as cliente_cpf_cnpj, 
-                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.bairro as cliente_bairro, c.cep as cliente_cep
+                   c.endereco as cliente_endereco, c.numero as cliente_numero, c.complemento as cliente_complemento, c.bairro as cliente_bairro, c.cep as cliente_cep
             FROM orcamentos o
             JOIN clientes c ON o.cliente_id = c.id
             WHERE o.token_publico = ?

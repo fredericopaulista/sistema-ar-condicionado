@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS clientes (
     cpf_cnpj VARCHAR(20),
     endereco VARCHAR(255),
     numero VARCHAR(20),
+    complemento VARCHAR(100),
     bairro VARCHAR(100),
     cep VARCHAR(10),
     cidade VARCHAR(100),

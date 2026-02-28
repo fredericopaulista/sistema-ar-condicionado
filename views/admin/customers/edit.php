@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="col-span-1 md:col-span-2">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-slate-300 mb-2">Endereço</label>
                             <input type="text" name="endereco" value="<?= $cliente['endereco'] ?>" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-blue-500">
@@ -38,6 +38,10 @@
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Número</label>
                             <input type="text" name="numero" value="<?= $cliente['numero'] ?? '' ?>" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Comp. <span class="text-slate-500 font-normal">(Opcional)</span></label>
+                            <input type="text" name="complemento" value="<?= $cliente['complemento'] ?? '' ?>" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Bairro</label>
