@@ -49,6 +49,14 @@
                                     <option value="ssl" <?= ($config['mail_secure'] ?? '') === 'ssl' ? 'selected' : '' ?>>SSL (Porta 465)</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Nome do Remetente (Ex: SÓ AR BH)</label>
+                                <input type="text" name="config[mail_from_name]" value="<?= htmlspecialchars($config['mail_from_name'] ?? '') ?>" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-400 mb-1">E-mail do Remetente (Obrigatório para alguns servidores)</label>
+                                <input type="text" name="config[mail_from_email]" value="<?= htmlspecialchars($config['mail_from_email'] ?? '') ?>" placeholder="Se vazio, usará o Usuário / E-mail acima" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-300 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                     </div>
 

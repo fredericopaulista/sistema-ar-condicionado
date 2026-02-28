@@ -19,8 +19,9 @@ class EmailService
             'port' => $config['mail_port'] ?? 587,
             'user' => $config['mail_user'] ?? '',
             'pass' => $config['mail_pass'] ?? '',
-            'from_name' => $config['mail_from_name'] ?? 'SÓ AR BH',
-            'secure' => $config['mail_secure'] ?? 'tls'
+            'from_name' => $config['mail_from_name'] ?? 'SÓ AR BH - Climatização',
+            'secure' => $config['mail_secure'] ?? 'tls',
+            'from_email' => $config['mail_from_email'] ?? ($config['mail_user'] ?? '')
         ];
     }
 
@@ -38,7 +39,7 @@ class EmailService
             $mail->Port       = $this->config['port'];
             $mail->CharSet    = 'UTF-8';
 
-            $mail->setFrom($this->config['user'], $this->config['from_name']);
+            $mail->setFrom($this->config['from_email'], $this->config['from_name']);
             $mail->addAddress($toEmail, $toName);
 
             $mail->isHTML(true);
@@ -87,7 +88,7 @@ class EmailService
             $mail->Port       = $this->config['port'];
             $mail->CharSet    = 'UTF-8';
 
-            $mail->setFrom($this->config['user'], $this->config['from_name']);
+            $mail->setFrom($this->config['from_email'], $this->config['from_name']);
             $mail->addAddress($toEmail, $toName);
 
             $mail->isHTML(true);
@@ -118,6 +119,60 @@ class EmailService
             return $mail->send();
         } catch (Exception $e) {
             error_log("Contract email sending failed: {$mail->ErrorInfo}");
+            return false;
+        }
+    }
+
+    public function sendSignedContractNotification($toEmail, $toName, $quoteNumber, $pdfPath)
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = $this->config['host'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $this->config['user'];
+            $mail->Password   = $this->config['pass'];
+            $mail->SMTPSecure = ($this->config['secure'] === 'ssl') ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = $this->config['port'];
+            $mail->CharSet    = 'UTF-8';
+
+            $mail->setFrom($this->config['from_email'], $this->config['from_name']);
+            $mail->addAddress($toEmail, $toName);
+            
+            // CC the company (using from_email)
+            $mail->addCC($this->config['from_email'], $this->config['from_name']);
+
+            if (file_exists($pdfPath)) {
+                $mail->addAttachment($pdfPath);
+            }
+
+            $mail->isHTML(true);
+            $mail->Subject = "Contrato Assinado - Orçamento [{$quoteNumber}] - SÓ AR BH";
+            
+            $body = "
+                <div style='font-family: sans-serif; color: #334155; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>
+                    <div style='background: #10b981; padding: 32px; text-align: center;'>
+                        <h1 style='color: white; margin: 0;'>SÓ AR BH</h1>
+                    </div>
+                    <div style='padding: 32px;'>
+                        <h2 style='color: #1e293b; margin-top: 0;'>Tudo pronto, {$toName}!</h2>
+                        <p>Seu orçamento foi assinado com sucesso e o contrato já está formalizado.</p>
+                        <p>Orçamento: <strong>{$quoteNumber}</strong></p>
+                        <p>Anexamos uma cópia do contrato assinado (PDF) contendo o carimbo de data/hora e IP para sua segurança.</p>
+                        <p style='margin-top: 32px; font-size: 14px; color: #64748b;'>Nossa equipe entrará em contato em breve para alinhar os próximos passos da execução do serviço.</p>
+                    </div>
+                    <div style='background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8;'>
+                        &copy; " . date('Y') . " SÓ AR BH Climatização - Todos os direitos reservados.
+                    </div>
+                </div>
+            ";
+
+            $mail->Body = $body;
+
+            return $mail->send();
+        } catch (Exception $e) {
+            error_log("Signed contract email failed: {$mail->ErrorInfo}");
             return false;
         }
     }

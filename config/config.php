@@ -2,7 +2,7 @@
 
 return [
     'db' => [
-        'host' => 'localhost',
+        'host' => '177.136.234.91',
         'dbname' => 'soarcondicionado_crm',
         'user' => 'soarcondicionado_cm',
         'pass' => '?*4kqWSh1N0V;+~1',

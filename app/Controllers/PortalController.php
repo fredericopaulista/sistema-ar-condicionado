@@ -117,7 +117,16 @@ class PortalController extends BaseController
                 $stmtItems->execute([$orcamento['id']]);
                 $orcamento['itens'] = $stmtItems->fetchAll();
                 
-                \App\Services\ContratoService::gerarPDF($orcamento);
+                $pdfData = \App\Services\ContratoService::gerarPDF($orcamento);
+
+                // 5. Send Email Notification with PDF
+                $emailService = new \App\Services\EmailService();
+                $emailService->sendSignedContractNotification(
+                    $orcamento['cliente_email'], 
+                    $orcamento['cliente_nome'], 
+                    $orcamento['numero'], 
+                    $pdfData['path']
+                );
 
                 $this->json(['success' => true, 'message' => 'Orçamento aprovado e assinado com sucesso!']);
             } else {
