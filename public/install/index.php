@@ -7,8 +7,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$configFile = __DIR__ . '/../config/config.php';
-$sqlFile = __DIR__ . '/../config/database.sql';
+$configFile = __DIR__ . '/../../config/config.php';
+$sqlFile = __DIR__ . '/../../config/database.sql';
 
 // Redirect if already installed (prevent accidental resets)
 if (file_exists($configFile)) {
@@ -124,7 +124,7 @@ if ($step == 3 && $_SERVER['REQUEST_METHOD'] == 'POST') {
                 $checks = [
                     'Versão PHP 8.2+' => PHP_VERSION_ID >= 80200,
                     'Extensão PDO' => extension_loaded('pdo_mysql'),
-                    'Permissão pasta config/' => is_writable(__DIR__ . '/../config/'),
+                    'Permissão pasta config/' => is_writable(__DIR__ . '/../../config/'),
                 ];
                 $allClear = true;
                 foreach($checks as $label => $pass): if(!$pass) $allClear = false; ?>
